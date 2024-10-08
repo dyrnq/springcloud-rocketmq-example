@@ -83,21 +83,25 @@ fastListenPort="10909"
 listenPort="10911"
 haListenPort="10912"
 
+k=0;
 for i in {1..6} ; do
 name="mqbroker${i}";
 broker_name="RaftNode00";
 
 
-if [ $i -lt 4 ]; then
-  broker_name="RaftNode00";
-  dLegerPeers="n0-${ip4}:11912;n1-${ip4}:12912;n2-${ip4}:13912"
-  dLegerSelfId="n$((i-1))";
+
+broker_name="RaftNode0${k}";
+dLegerSelfId="n$((i-1-3*k))";
+dLegerPeers="n0-${ip4}:$(((3*k+1)*1000 + haListenPort));n1-${ip4}:$(((3*k+2)*1000 + haListenPort));n2-${ip4}:$(((3*k+3)*1000 + haListenPort))"
+# 11912,12912,13912
+# 14912,15912,16912
+
+if (( i % 3 == 0 )); then
+  k=$((k+1))
 fi
-if [ $i -gt 3 ] && [ $i -lt 7 ] ; then
-  broker_name="RaftNode01";
-  dLegerPeers="n0-${ip4}:14912;n1-${ip4}:15912;n2-${ip4}:16912"
-  dLegerSelfId="n$((i-1-3*1))";
-fi
+
+
+
 
 
 next_fastListenPort=$((fastListenPort+1000*i))

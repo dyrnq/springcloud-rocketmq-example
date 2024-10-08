@@ -7,13 +7,18 @@ spring:
           group: demo
         bindings:
           consumerEvent-in-0:
+            # https://github.com/alibaba/spring-cloud-alibaba/wiki/RocketMQ#rocketmq-consumer-properties
             subscription: test
             consumer:
               maxConcurrency: 10
               prefetch: 10
           consumerEvent-out-0:
+            # https://github.com/alibaba/spring-cloud-alibaba/wiki/RocketMQ#rocketmq-provider-properties
             producer:
               sync: false
+#              sendMessageTimeout: 6000
+#              retryTimesWhenSendFailed: 10
+#              retryTimesWhenSendAsyncFailed: 10
       bindings:
         consumerEvent-out-0:
           destination: demo
@@ -29,3 +34,8 @@ spring:
 
       function:
         definition: consumerEvent
+logging:
+  level:
+    root: INFO
+  file:
+    name: logs/myapp.log

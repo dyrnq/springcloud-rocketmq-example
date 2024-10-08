@@ -20,6 +20,7 @@ Vagrant.configure("2") do |config|
     my_machines = {
         'server'   => '192.168.88.123',
         'raft'     => '192.168.88.128',
+        'r1'       => '192.168.88.129',
     }
 
     my_machines.each do |name, ip|
@@ -32,7 +33,7 @@ Vagrant.configure("2") do |config|
                 vb.customize ["modifyvm", :id, "--vram", "128"]
                 vb.customize ["modifyvm", :id, "--ioapic", "on"]
                 vb.customize ["modifyvm", :id, "--cpus", "4"]
-                vb.customize ["modifyvm", :id, "--memory", "8192"]
+                vb.customize ["modifyvm", :id, "--memory", "16384"]
             end
 
             machine.vm.provision "shell", path: "./scripts/init.sh"

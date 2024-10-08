@@ -2,7 +2,6 @@ package com.dyrnq.sca.rocketmq;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ThreadUtils;
 import org.apache.rocketmq.common.message.MessageConst;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -11,9 +10,6 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -26,12 +22,13 @@ public class StreamProducerRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        System.out.println("run");
-
-
-        List<Message<MessageInfo>> messageInfoList = new ArrayList<>();
 
         int index = 1;
+        long begin = System.currentTimeMillis();
+        long end = 0L;
+        double avg = 0;
+        log.info("streamBridge.isAsync():{}", streamBridge.isAsync());
+//        streamBridge.setAsync(true);
         while (true) {
 
             MessageInfo message = MessageInfo.builder().build();
@@ -43,12 +40,22 @@ public class StreamProducerRunner implements ApplicationRunner {
             Message<MessageInfo> info = MessageBuilder.withPayload(message)
                     .setHeader(MessageConst.PROPERTY_TAGS, MESSAGE_TAG) //  <1> 设置 Tag
                     .build();
-
             streamBridge.send(CONSUMER_EVENT_OUT_0, info);
 
             index++;
-            ThreadUtils.sleep(Duration.ofMillis(2000));
-        }
+            if (index % 1000 == 0) {
+                end = System.currentTimeMillis();
+                avg = (double) Math.round((end - begin) * 100.0 / index) / 100.0;
+                log.info("index {}, use time {}, avg {} ", index, (end - begin) + "", avg);
+            }
+            //ThreadUtils.sleep(Duration.ofMillis(2000));
 
+            if (index > 10 * 10000) {
+                break;
+            }
+        }
+        end = System.currentTimeMillis();
+        avg = (double) Math.round((end - begin) * 100.0 / index) / 100.0;
+        log.info("over index {}, use time {}, avg {} ", index, (end - begin) + "", avg);
     }
 }

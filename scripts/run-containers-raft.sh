@@ -75,6 +75,7 @@ dLegerGroup=_BROKERNAME
 dLegerPeers=
 dLegerSelfId=
 sendMessageThreadPoolNums=16
+waitTimeMillsInSendQueue=600
 brokerIP1=${ip4}
 EOF
 
@@ -120,7 +121,7 @@ docker run -d \
 --name $name \
 --restart always \
 -e TZ="Asia/Shanghai" \
--e JAVA_OPT_EXT="-Duser.home=/home/rocketmq -Xms512m -Xmx512m -Xmn128m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m" \
+-e JAVA_OPT_EXT="-Duser.home=/home/rocketmq -Xms1g -Xmx1g -Xmn128m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m" \
 -v $HOME/var/lib/$name/logs:/home/rocketmq/logs \
 -v $HOME/var/lib/$name/store:/home/rocketmq/store \
 -v $HOME/$name.conf:/etc/rocketmq/broker.conf \

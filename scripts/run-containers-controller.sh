@@ -43,20 +43,20 @@ fun_add_mynet(){
 
 fun_install_rocketmq(){
 
-docker rm -f mqnamesrv1 2>/dev/null || true
+docker rm -f n1 2>/dev/null || true
 
-mkdir -p $HOME/var/lib/mqnamesrv1/logs
-mkdir -p $HOME/var/lib/mqnamesrv1/store
+mkdir -p $HOME/var/lib/n1/logs
+mkdir -p $HOME/var/lib/n1/store
 
-chown -R 3000:3000 $HOME/var/lib/mqnamesrv1 || sudo chown -R 3000:3000 $HOME/var/lib/mqnamesrv1
+chown -R 3000:3000 $HOME/var/lib/n1 || sudo chown -R 3000:3000 $HOME/var/lib/n1
 
 docker run -d \
---name mqnamesrv1 \
+--name n1 \
 --restart always \
 -e TZ="Asia/Shanghai" \
 -e JAVA_OPT_EXT="-Duser.home=/home/rocketmq -Xms512m -Xmx512m -Xmn128m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m" \
--v $HOME/var/lib/mqnamesrv1/logs:/home/rocketmq/logs \
--v $HOME/var/lib/mqnamesrv1/store:/home/rocketmq/store \
+-v $HOME/var/lib/n1/logs:/home/rocketmq/logs \
+-v $HOME/var/lib/n1/store:/home/rocketmq/store \
 -p 9876:9876 \
 --network mynet \
 ${rocketmq_image} mqnamesrv
@@ -151,12 +151,12 @@ listenPort="10911"
 haListenPort="10912"
 
 for i in {1..4} ; do
-name="mqbroker${i}";
-broker_name="mqbroker${i}";
+name="q${i}";
+broker_name="q${i}";
 brokerId=-1;
 brokerRole="SLAVE"
 if (( i % 2 == 0 )); then
-  broker_name="mqbroker$((i-1))";
+  broker_name="q$((i-1))";
 fi
 
 next_fastListenPort=$((fastListenPort+1000*i))
@@ -167,7 +167,7 @@ sed \
 -e "s@10911@${next_listenPort}@g" \
 -e "s@brokerId=0@brokerId=${brokerId}@g" \
 -e "s@brokerRole=ASYNC_MASTER@brokerRole=${brokerRole}@g" \
--e "s@_NAMESRVADDR@mqnamesrv1:9876@" /tmp/broker.sed > $HOME/$name.conf
+-e "s@_NAMESRVADDR@n1:9876@" /tmp/broker.sed > $HOME/$name.conf
 
 ## https://rocketmq.apache.org/zh/docs/deploymentOperations/03autofailover#broker-%E9%83%A8%E7%BD%B2
 (
@@ -200,12 +200,12 @@ docker run -d \
 ${rocketmq_image} mqbroker -c /etc/rocketmq/broker.conf
 done
 
-docker rm -f rmqconsole 2>/dev/null || true
+docker rm -f w1 2>/dev/null || true
 docker run -d \
---name rmqconsole \
+--name w1 \
 --restart always \
 --network mynet \
--e JAVA_OPTS="-Drocketmq.namesrv.addr=mqnamesrv1:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false" \
+-e JAVA_OPTS="-Drocketmq.namesrv.addr=n1:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false" \
 -p 28080:8080 \
 styletang/rocketmq-console-ng
 }

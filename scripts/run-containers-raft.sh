@@ -43,20 +43,20 @@ fun_add_mynet(){
 
 fun_install_rocketmq(){
 
-docker rm -f mqnamesrv1 2>/dev/null || true
+docker rm -f n1 2>/dev/null || true
 
-mkdir -p $HOME/var/lib/mqnamesrv1/logs
-mkdir -p $HOME/var/lib/mqnamesrv1/store
+mkdir -p $HOME/var/lib/n1/logs
+mkdir -p $HOME/var/lib/n1/store
 
-chown -R 3000:3000 $HOME/var/lib/mqnamesrv1 || sudo chown -R 3000:3000 $HOME/var/lib/mqnamesrv1
+chown -R 3000:3000 $HOME/var/lib/n1 || sudo chown -R 3000:3000 $HOME/var/lib/n1
 
 docker run -d \
---name mqnamesrv1 \
+--name n1 \
 --restart always \
 -e TZ="Asia/Shanghai" \
 -e JAVA_OPT_EXT="-Duser.home=/home/rocketmq -Xms512m -Xmx512m -Xmn128m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m" \
--v $HOME/var/lib/mqnamesrv1/logs:/home/rocketmq/logs \
--v $HOME/var/lib/mqnamesrv1/store:/home/rocketmq/store \
+-v $HOME/var/lib/n1/logs:/home/rocketmq/logs \
+-v $HOME/var/lib/n1/store:/home/rocketmq/store \
 -p 9876:9876 \
 --network mynet \
 ${rocketmq_image} mqnamesrv
@@ -85,7 +85,7 @@ haListenPort="10912"
 
 k=0;
 for i in {1..6} ; do
-name="mqbroker${i}";
+name="q${i}";
 broker_name="RaftNode00";
 
 
@@ -112,7 +112,7 @@ sed \
 -e "s@10911@${next_listenPort}@g" \
 -e "s@dLegerPeers=@dLegerPeers=${dLegerPeers}@g" \
 -e "s@dLegerSelfId=@dLegerSelfId=${dLegerSelfId}@g" \
--e "s@_NAMESRVADDR@mqnamesrv1:9876@" /tmp/broker.sed > $HOME/$name.conf
+-e "s@_NAMESRVADDR@n1:9876@" /tmp/broker.sed > $HOME/$name.conf
 
 
 docker rm -f $name 2>/dev/null || true
@@ -136,12 +136,12 @@ docker run -d \
 ${rocketmq_image} mqbroker -c /etc/rocketmq/broker.conf
 done
 
-docker rm -f rmqconsole 2>/dev/null || true
+docker rm -f w1 2>/dev/null || true
 docker run -d \
---name rmqconsole \
+--name w1 \
 --restart always \
 --network mynet \
--e JAVA_OPTS="-Drocketmq.namesrv.addr=mqnamesrv1:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false" \
+-e JAVA_OPTS="-Drocketmq.namesrv.addr=n1:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false" \
 -p 28080:8080 \
 styletang/rocketmq-console-ng
 }

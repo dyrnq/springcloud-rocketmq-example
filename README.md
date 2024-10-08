@@ -63,3 +63,10 @@ RaftCluster             RaftNode01              0     192.168.88.128:14911   V5_
 RaftCluster             RaftNode01              2     192.168.88.128:15911   V5_3_0                 0.00(0,0ms)       0.00(0,0ms)  3-0(0.0w, 0.0, 0.0)               0  480099.47     0.0100         false
 RaftCluster             RaftNode01              3     192.168.88.128:16911   V5_3_0                 0.00(0,0ms)       0.00(0,0ms)  604757-0(0.0w, 0.0, 0.0)            0  480099.47     0.0100         false
 ```
+
+## conclusion
+
+- replication= slave+1
+- 高吞吐= 多组ms或者多组raft
+- 高可用= (多组ms或者多组raft) && master保活
+- 同一组内ms或者同一组内raft,brokerName相同,brokerId不同,也就是说一组ms（或者raft)对外身份(brokerName)一致，对内身份(brokerId)不同

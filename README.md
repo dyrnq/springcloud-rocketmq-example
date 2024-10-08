@@ -48,3 +48,18 @@ root@f2b36aa77e34:/opt/rocketmq/bin# mqadmin topicStatus -n mqnamesrv1:9876 -t b
 mqbroker1                         0     0                     0                       
 mqbroker3                         0     0                     0                       
 ```
+
+## 2group-raft
+
+> 1group-raft ≈ 1m2s
+
+```bash
+root@c48216352093:/opt/rocketmq/bin# mqadmin clusterList -n mqnamesrv1:9876
+#Cluster Name           #Broker Name            #BID  #Addr                  #Version              #InTPS(LOAD)     #OutTPS(LOAD)  #Timer(Progress)        #PCWait(ms)  #Hour         #SPACE    #ACTIVATED
+RaftCluster             RaftNode00              0     192.168.88.128:11911   V5_3_0                 0.00(0,0ms)       0.00(0,0ms)  0-0(0.0w, 0.0, 0.0)               0  480099.47     0.0100          true
+RaftCluster             RaftNode00              2     192.168.88.128:12911   V5_3_0                 0.00(0,0ms)       0.00(0,0ms)  1-0(0.0w, 0.0, 0.0)               0  480099.47     0.0100         false
+RaftCluster             RaftNode00              3     192.168.88.128:13911   V5_3_0                 0.00(0,0ms)       0.00(0,0ms)  2-0(0.0w, 0.0, 0.0)               0  480099.47     0.0100         false
+RaftCluster             RaftNode01              0     192.168.88.128:14911   V5_3_0                 0.00(0,0ms)       0.00(0,0ms)  0-0(0.0w, 0.0, 0.0)               0  480099.47     0.0100          true
+RaftCluster             RaftNode01              2     192.168.88.128:15911   V5_3_0                 0.00(0,0ms)       0.00(0,0ms)  3-0(0.0w, 0.0, 0.0)               0  480099.47     0.0100         false
+RaftCluster             RaftNode01              3     192.168.88.128:16911   V5_3_0                 0.00(0,0ms)       0.00(0,0ms)  604757-0(0.0w, 0.0, 0.0)            0  480099.47     0.0100         false
+```

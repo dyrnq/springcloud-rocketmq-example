@@ -67,6 +67,7 @@ RaftCluster             RaftNode01              3     192.168.88.128:16911   V5_
 ## conclusion
 
 - replication= slave+1
-- 高吞吐= 多组ms或者多组raft
-- 高可用= (多组ms或者多组raft) && master保活
+- 数据安全 = 多副本机制(ms或者raft,raft实质上也是ms,与ms不同的是实现了自动选举leader,可以理解为动态的ms)
+- 高吞吐 ≈ 分区负载 = 多组集群
+- 高可用 = （多组ms或者多组raft）&& master保活
 - 同一组内ms或者同一组内raft,brokerName相同,brokerId不同,也就是说一组ms（或者raft)对外身份(brokerName)一致，对内身份(brokerId)不同

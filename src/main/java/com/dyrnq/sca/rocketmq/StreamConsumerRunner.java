@@ -9,6 +9,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+
 @Component
 @Slf4j
 public class StreamConsumerRunner implements ApplicationRunner {
@@ -33,7 +35,8 @@ public class StreamConsumerRunner implements ApplicationRunner {
                 // 获取 Queue ID
                 int queueId = msg.getQueueId();
 
-                log.info("Broker: {} , Queue ID: {} , Message ID: {} , Received message: {}", brokerName, queueId, messageId, messageBody);
+
+                log.info("storeHost: {}, Broker: {} , Queue ID: {} , Message ID: {} , Received message: {}",  msg.getStoreHost().toString(), brokerName, queueId, messageId, messageBody);
             }
             return null; // 返回消费状态
         });

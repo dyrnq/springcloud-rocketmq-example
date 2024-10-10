@@ -48,7 +48,7 @@ docker rm -f n1 2>/dev/null || true
 mkdir -p $HOME/var/lib/n1/logs
 mkdir -p $HOME/var/lib/n1/store
 
-chown -R 3000:3000 $HOME/var/lib/n1 || sudo chown -R 3000:3000 $HOME/var/lib/n1
+chown -R 3000:3000 $HOME/var/lib/n1 2>/dev/null || sudo chown -R 3000:3000 $HOME/var/lib/n1
 
 docker run -d \
 --name n1 \
@@ -120,7 +120,7 @@ docker rm -f $name 2>/dev/null || true
 mkdir -p $HOME/var/lib/$name/logs
 mkdir -p $HOME/var/lib/$name/store
 
-chown -R 3000:3000 $HOME/var/lib/$name || sudo chown -R 3000:3000 $HOME/var/lib/$name
+chown -R 3000:3000 $HOME/var/lib/$name 2>/dev/null || sudo chown -R 3000:3000 $HOME/var/lib/$name
 docker run -d \
 --name $name \
 --restart always \

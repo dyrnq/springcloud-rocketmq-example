@@ -211,5 +211,51 @@ styletang/rocketmq-console-ng
 }
 
 
+fun_install_rocketmq_proxy(){
+
+
+#########################  setup 2 instances proxy ##############################
+grpcServerPort=8081
+remotingListenPort=8080
+for i in {1..2} ; do
+name="p${i}";
+
+next_grpcServerPort=$((grpcServerPort+100*i))
+next_remotingListenPort=$((remotingListenPort+100*i))
+
+(
+echo "{"
+echo "\"namesrvAddr\": \"n1:9876\","
+echo "\"rocketMQClusterName\": \"DefaultCluster\","
+echo "\"proxyClusterName\": \"DefaultCluster\","
+echo "\"grpcServerPort\": ${next_grpcServerPort},"
+echo "\"remotingListenPort\": ${next_remotingListenPort}"
+echo "}"
+) > $HOME/$name.json
+cat < $HOME/$name.json
+docker rm -f $name 2>/dev/null || true
+
+mkdir -p $HOME/var/lib/$name/logs
+mkdir -p $HOME/var/lib/$name/store
+
+chown -R 3000:3000 $HOME/var/lib/$name 2>/dev/null || sudo chown -R 3000:3000 $HOME/var/lib/$name
+docker run -d \
+--name $name \
+--restart always \
+-e TZ="Asia/Shanghai" \
+-e JAVA_OPT_EXT="-Duser.home=/home/rocketmq -Xms512m -Xmx512m -Xmn128m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m" \
+-v $HOME/var/lib/$name/logs:/home/rocketmq/logs \
+-v $HOME/var/lib/$name/store:/home/rocketmq/store \
+-v $HOME/$name.json:/etc/rocketmq/proxyConfig.json \
+-p ${next_grpcServerPort}:${next_grpcServerPort} \
+-p ${next_remotingListenPort}:${next_remotingListenPort} \
+--network mynet \
+${rocketmq_image} mqproxy --proxyConfigPath /etc/rocketmq/proxyConfig.json
+done
+
+}
+
 fun_add_mynet
 fun_install_rocketmq
+echo "sleep 5s" && sleep 5s;
+fun_install_rocketmq_proxy

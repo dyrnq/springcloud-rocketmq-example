@@ -54,7 +54,6 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-stream-rocketmq</artifactId>
-            <version>2023.0.1.2</version>
         </dependency>
 
         <dependency>

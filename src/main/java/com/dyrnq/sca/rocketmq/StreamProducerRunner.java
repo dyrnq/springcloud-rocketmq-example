@@ -27,7 +27,7 @@ public class StreamProducerRunner implements ApplicationRunner {
         long begin = System.currentTimeMillis();
         long end = 0L;
         double avg = 0;
-        log.info("streamBridge.isAsync():{}", streamBridge.isAsync());
+//        log.info("streamBridge.isAsync():{}", streamBridge.isAsync());
 //        streamBridge.setAsync(true);
         while (true) {
 

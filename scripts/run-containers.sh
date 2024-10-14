@@ -74,8 +74,6 @@ autoCreateSubscriptionGroup=true
 listenPort=10911
 deleteWhen=04
 fileReservedTime=120
-mapedFileSizeCommitLog=1073741824
-mapedFileSizeConsumeQueue=300000
 diskMaxUsedSpaceRatio=88
 
 # 存储路径

@@ -68,37 +68,9 @@ brokerClusterName=DefaultCluster
 brokerName=_BROKERNAME
 brokerId=0
 namesrvAddr=_NAMESRVADDR
-defaultTopicQueueNums=4
 autoCreateTopicEnable=true
 autoCreateSubscriptionGroup=true
 listenPort=10911
-deleteWhen=04
-fileReservedTime=120
-diskMaxUsedSpaceRatio=88
-
-# 存储路径
-#storePathRootDir=/rocketmq/store
-
-# commitLog 存储路径
-#storePathCommitLog=/rocketmq/store/commitlog
-
-# 消费队列存储
-#storePathConsumeQueue=/rocketmq/store/consumequeue
-
-# 消息索引存储路径
-#storePathIndex=/rocketmq/store/index
-
-# checkpoint 文件存储路径
-#storeCheckpoint=/rocketmq/store/checkpoint
-
-# abort 文件存储路径
-#abortFile=/rocketmq/store/abort
-# 限制的消息大小
-maxMessageSize=65536
-#flushCommitLogLeastPages=4
-#flushConsumeQueueLeastPages=2
-#flushCommitLogThoroughInterval=10000
-#flushConsumeQueueThoroughInterval=60000
 # Broker的角色
 # ASYNC_MASTER 异步复制Master
 # SYNC_MASTER 同步双写Master
@@ -108,10 +80,6 @@ brokerRole=ASYNC_MASTER
 # ASYNC_FLUSH 异步刷盘
 # SYNC_FLUSH 同步刷盘
 flushDiskType=ASYNC_FLUSH
-# 发消息线程池数量
-#sendMessageThreadPoolNums=128
-# 拉消息线程池数量
-#pullMessageThreadPoolNums=128
 waitTimeMillsInSendQueue=600
 brokerIP1=${ip4}
 EOF

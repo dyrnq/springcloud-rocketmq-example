@@ -3,6 +3,7 @@ package com.dyrnq.sca.rocketmq;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.stream.converter.ObjectStringMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.converter.MessageConverter;
 
@@ -16,6 +17,6 @@ public class RocketmqApplication {
 
     @Bean
     public MessageConverter customMessageConverter() {
-        return new MyCustomMessageConverter();
+        return new org.springframework.cloud.stream.converter.ObjectStringMessageConverter();
     }
 }

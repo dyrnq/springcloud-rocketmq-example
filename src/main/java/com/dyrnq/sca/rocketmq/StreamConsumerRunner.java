@@ -45,8 +45,9 @@ public class StreamConsumerRunner implements ApplicationRunner {
                 // 获取 Queue ID
                 int queueId = msg.getQueueId();
 
-
-                log.info("storeHost: {}, Broker: {} , Queue ID: {} , Message ID: {} , Received message: {}",  msg.getStoreHost().toString(), brokerName, queueId, messageId, messageBody);
+                int sysFlag = msg.getSysFlag();
+                boolean isCompressed = (sysFlag & 0x1) != 0;
+                log.info("isCompressed: {}, storeHost: {}, Broker: {} , Queue ID: {} , Message ID: {} , Received message: {}", isCompressed, msg.getStoreHost().toString(), brokerName, queueId, messageId, messageBody);
             }
 //            return null; // 返回消费状态
             return ConsumeConcurrentlyStatus.CONSUME_SUCCESS; // 返回消费成功状态，自动提交

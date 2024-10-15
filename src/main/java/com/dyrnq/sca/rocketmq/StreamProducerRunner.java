@@ -10,8 +10,6 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
-
 @Component
 @AllArgsConstructor
 @Slf4j
@@ -19,6 +17,17 @@ public class StreamProducerRunner implements ApplicationRunner {
     private static final String CONSUMER_EVENT_OUT_0 = "consumerEvent-out-0";
     private static final String MESSAGE_TAG = "test";
     private final StreamBridge streamBridge;
+
+    public static String genFixedString(int charCount) {
+        byte[] byteArray = new byte[charCount];
+
+        for (int i = 0; i < byteArray.length; i++) {
+            byteArray[i] = 'A';
+        }
+
+        String str = new String(byteArray);
+        return str;
+    }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -31,14 +40,37 @@ public class StreamProducerRunner implements ApplicationRunner {
 //        streamBridge.setAsync(true);
         while (true) {
 
-            MessageInfo message = MessageInfo.builder().build();
-            String body = UUID.randomUUID().toString();
-            message.setBody(body);
-            message.setIndex(index);
+//            MessageInfo message = MessageInfo.builder().build();
+//            String body = UUID.randomUUID().toString();
+//            body = genFixedString(5000);
+//            message.setBody(body);
+//            message.setIndex(index);
+//
+//            // 创建 Spring Message 对象
+//            Message<MessageInfo> info = MessageBuilder.withPayload(message)
+//                    .setHeader(MessageConst.PROPERTY_TAGS, MESSAGE_TAG) //  <1> 设置 Tag
+//                    .build();
 
-            // 创建 Spring Message 对象
-            Message<MessageInfo> info = MessageBuilder.withPayload(message)
-                    .setHeader(MessageConst.PROPERTY_TAGS, MESSAGE_TAG) //  <1> 设置 Tag
+
+            String myStr = """
+                    {"body":"%s",index":%d}
+                    """;
+
+            String outStr = String.format(myStr, "", index).trim();
+            int increase = 1;
+            int wantBodySize = 4095;
+
+            if (index % 7 == 0) {
+                wantBodySize = 4096;
+            }
+            while (outStr.getBytes().length < wantBodySize) {
+                outStr = String.format(myStr, genFixedString(increase), index).trim();
+                increase++;
+            }
+//            log.warn("bytes length:{} ", outStr.getBytes().length);
+
+            Message<String> info = MessageBuilder.withPayload(outStr)
+                    .setHeader(MessageConst.PROPERTY_TAGS, MESSAGE_TAG)
                     .build();
             streamBridge.send(CONSUMER_EVENT_OUT_0, info);
 
@@ -50,7 +82,7 @@ public class StreamProducerRunner implements ApplicationRunner {
             }
             //ThreadUtils.sleep(Duration.ofMillis(2000));
 
-            if (index > 10 * 10000) {
+            if (index > 10 * 10) {
                 break;
             }
         }

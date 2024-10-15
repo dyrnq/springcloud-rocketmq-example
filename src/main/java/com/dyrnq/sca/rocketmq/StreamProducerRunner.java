@@ -53,7 +53,7 @@ public class StreamProducerRunner implements ApplicationRunner {
 
 
             String myStr = """
-                    {"body":"%s",index":%d}
+                    {"body":"%s","index":%d}
                     """;
 
             String outStr = String.format(myStr, "", index).trim();

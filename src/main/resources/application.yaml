@@ -20,7 +20,7 @@ spring:
               sync: false
               #              compressMsgBodyOverHowmuch:
               compressMessageBodyThreshold: 900009
-              compressMsgBodyThreshold: 4096
+              compressMsgBodyThreshold: 5097
 #              sendMsgTimeout: 1
 #              sendMessageTimeout: 6000
       #              retryTimesWhenSendFailed: 10

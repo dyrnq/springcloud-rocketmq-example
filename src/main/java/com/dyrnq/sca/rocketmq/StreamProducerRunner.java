@@ -58,10 +58,10 @@ public class StreamProducerRunner implements ApplicationRunner {
 
             String outStr = String.format(myStr, "", index).trim();
             int increase = 1;
-            int wantBodySize = 4095;
+            int wantBodySize = 5096;
 
             if (index % 7 == 0) {
-                wantBodySize = 4096;
+                wantBodySize = 5097;
             }
             while (outStr.getBytes().length < wantBodySize) {
                 outStr = String.format(myStr, genFixedString(increase), index).trim();

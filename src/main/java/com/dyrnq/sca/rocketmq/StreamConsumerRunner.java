@@ -1,5 +1,7 @@
 package com.dyrnq.sca.rocketmq;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
@@ -21,6 +23,7 @@ public class StreamConsumerRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("your_consumer_group");
         consumer.setNamesrvAddr(rocketmqNameSrv);
+        consumer.setMaxReconsumeTimes(2);
 
 //        consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_LAST_OFFSET);  //从最新的消息开始消费
 //        consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_LAST_OFFSET_AND_FROM_MIN_WHEN_BOOT_FIRST);  //废弃，效果同上
@@ -47,6 +50,14 @@ public class StreamConsumerRunner implements ApplicationRunner {
 
                 int sysFlag = msg.getSysFlag();
                 boolean isCompressed = (sysFlag & 0x1) != 0;
+
+                try {
+                    JSONObject json = JSON.parseObject(messageBody);
+                } catch (com.alibaba.fastjson2.JSONException e) {
+                    log.error(e.getMessage());
+                    return ConsumeConcurrentlyStatus.RECONSUME_LATER;
+                }
+
                 log.info("isCompressed: {}, storeHost: {}, Broker: {} , Queue ID: {} , Message ID: {} , Received message: {}", isCompressed, msg.getStoreHost().toString(), brokerName, queueId, messageId, messageBody);
             }
 //            return null; // 返回消费状态

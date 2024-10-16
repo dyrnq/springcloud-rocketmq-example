@@ -12,6 +12,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 @Slf4j
 public class StreamConsumerRunner implements ApplicationRunner {
@@ -57,8 +59,9 @@ public class StreamConsumerRunner implements ApplicationRunner {
                     log.error(e.getMessage());
                     return ConsumeConcurrentlyStatus.RECONSUME_LATER;
                 }
+                Map<String, String> headers = msg.getProperties();
 
-                log.info("isCompressed: {}, storeHost: {}, Broker: {} , Queue ID: {} , Message ID: {} , Received message: {}", isCompressed, msg.getStoreHost().toString(), brokerName, queueId, messageId, messageBody);
+                log.info("headers: {}, isCompressed: {}, storeHost: {}, Broker: {} , Queue ID: {} , Message ID: {} , Received message: {}", headers, isCompressed, msg.getStoreHost().toString(), brokerName, queueId, messageId, messageBody);
             }
 //            return null; // 返回消费状态
             return ConsumeConcurrentlyStatus.CONSUME_SUCCESS; // 返回消费成功状态，自动提交

@@ -1,4 +1,4 @@
-package rocketmq;
+package com.dyrnq.sca.rocketmq;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

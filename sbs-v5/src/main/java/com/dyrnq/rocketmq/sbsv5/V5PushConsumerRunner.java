@@ -1,4 +1,4 @@
-package sbsv5;
+package com.dyrnq.rocketmq.sbsv5;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.annotation.RocketMQMessageListener;
@@ -17,7 +17,7 @@ public class V5PushConsumerRunner implements CommandLineRunner {
     }
 
     @Service
-    @RocketMQMessageListener(consumerGroup = "demo-group", topic = "demo-topic")
+    @RocketMQMessageListener(consumerGroup = "demo-group", topic = "normalTopic")
     public class MyConsumer1 implements RocketMQListener {
         @Override
         public ConsumeResult consume(MessageView messageView) {

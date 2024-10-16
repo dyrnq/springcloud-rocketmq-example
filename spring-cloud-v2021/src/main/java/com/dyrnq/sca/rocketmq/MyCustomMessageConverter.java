@@ -1,4 +1,4 @@
-package rocketmq;
+package com.dyrnq.sca.rocketmq;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.converter.AbstractMessageConverter;

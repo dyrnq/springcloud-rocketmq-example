@@ -1,4 +1,4 @@
-package sbsv5;
+package com.dyrnq.rocketmq.sbsv5;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;

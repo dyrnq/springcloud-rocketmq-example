@@ -1,3 +1,6 @@
+spring:
+  main:
+    web-application-type: none
 demo:
   rocketmq:
     delay-topic: delayTopic

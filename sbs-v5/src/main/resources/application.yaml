@@ -1,0 +1,20 @@
+demo:
+  rocketmq:
+    delay-topic: delayTopic
+    fifo-topic: fifoTopic
+    normal-topic: normalTopic
+    trans-topic: transTopic
+    message-group: group1
+rocketmq:
+  producer:
+    topic: normalTopic
+    endpoints: 192.168.88.123:8181
+  push-consumer:
+    endpoints: 192.168.88.123:8181
+    tag: '*'
+
+#  ./mqadmin updateTopic -c DefaultCluster -t delayTopic -n n1:9876 -a +message.type=DELAY
+#  ./mqadmin updateTopic -c DefaultCluster -t fifoTopic -n n1:9876 -a +message.type=FIFO
+#  ./mqadmin updateTopic -c DefaultCluster -t normalTopic -n n1:9876 -a +message.type=NORMAL
+#  ./mqadmin updateTopic -c DefaultCluster -t transTopic -n n1:9876 -a +message.type=TRANSACTION
+#  demo-topic

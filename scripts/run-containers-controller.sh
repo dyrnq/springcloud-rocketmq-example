@@ -221,7 +221,23 @@ done
 
 }
 
+fun_updateTopic(){
+
+#  ./mqadmin updateTopic -c DefaultCluster -t delayTopic -n n1:9876 -a +message.type=DELAY
+#  ./mqadmin updateTopic -c DefaultCluster -t fifoTopic -n n1:9876 -a +message.type=FIFO
+#  ./mqadmin updateTopic -c DefaultCluster -t normalTopic -n n1:9876 -a +message.type=NORMAL
+#  ./mqadmin updateTopic -c DefaultCluster -t transTopic -n n1:9876 -a +message.type=TRANSACTION
+#  ./mqadmin updateTopic -c DefaultCluster -t demo-topic -n n1:9876 -a +message.type=NORMAL
+
+docker exec -i q1 bash -c "./mqadmin updateTopic -c DefaultCluster -t delayTopic -n n1:9876 -a +message.type=DELAY"
+docker exec -i q1 bash -c "./mqadmin updateTopic -c DefaultCluster -t fifoTopic -n n1:9876 -a +message.type=FIFO"
+docker exec -i q1 bash -c "./mqadmin updateTopic -c DefaultCluster -t normalTopic -n n1:9876 -a +message.type=NORMAL"
+docker exec -i q1 bash -c "./mqadmin updateTopic -c DefaultCluster -t transTopic -n n1:9876 -a +message.type=TRANSACTION"
+docker exec -i q1 bash -c "./mqadmin updateTopic -c DefaultCluster -t demo-topic -n n1:9876 -a +message.type=NORMAL"
+}
+
 fun_add_mynet
 fun_install_rocketmq
 echo "sleep 5s" && sleep 5s;
 fun_install_rocketmq_proxy
+fun_updateTopic

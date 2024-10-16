@@ -79,19 +79,7 @@ RaftCluster             RaftNode01              3     192.168.88.128:16911   V5_
 | ~~多节点~~多组节点（集群）多副本模式-异步复制 | 每个Master配置一个Slave，有多组 Master-Slave，HA采用异步复制方式，主备有短暂消息延迟（毫秒级），这种模式的优缺点如下：  <br/>优点：即使磁盘损坏，消息丢失的非常少，且消息实时性不会受影响，同时Master宕机后，消费者仍然可以从Slave消费，而且此过程对应用透明，不需要人工干预，性能同多Master模式几乎一样；  <br/>缺点：Master宕机，磁盘损坏情况下会丢失少量消息。                                                |
 | ~~多节点~~多组节点（集群）多副本模式-同步双写 | 每个Master配置一个Slave，有~~多对~~多组 Master-Slave，HA采用同步双写方式，即只有主备都写成功，才向应用返回成功，这种模式的优缺点如下：  <br/>优点：数据与服务都无单点故障，Master宕机情况下，消息无延迟，服务可用性与数据可用性都非常高；  <br/>缺点：性能比异步复制模式略低（大约低10%左右），发送单个消息的RT会略高，且目前版本在主节点宕机后，备机不能自动切换为主机。                                                |
 
-## spring-boot3(spring cloud 2023.0.3) vs spring-boot2(spring cloud 2021.0.8) 
 
-```bash
-# spring-boot3 pom.xml
-
-./mvnw -B package -Dmaven.test.skip=true --file pom.xml
-cp -f target/rocketmq-0.0.1-SNAPSHOT.jar target/rocketmq-spring-boot3.jar
-
-# spring-boot2 pom-legacy.xml
-
-./mvnw -B package -Dmaven.test.skip=true --file pom-legacy.xml
-cp -f target/rocketmq-0.0.1-SNAPSHOT.jar target/rocketmq-spring-boot2.jar
-```
 
 ## ref
 - <https://rocketmq.apache.org/zh/docs/deploymentOperations/01deploy/#cluster%E6%A8%A1%E5%BC%8F%E9%83%A8%E7%BD%B2>

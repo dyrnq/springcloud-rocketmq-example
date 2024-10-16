@@ -13,5 +13,6 @@
         <module>spring-cloud-v2021</module>
         <module>sbs</module>
         <module>sbs-v5</module>
+        <module>client-v5</module>
     </modules>
 </project>

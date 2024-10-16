@@ -83,3 +83,8 @@ RaftCluster             RaftNode01              3     192.168.88.128:16911   V5_
 
 ## ref
 - <https://rocketmq.apache.org/zh/docs/deploymentOperations/01deploy/#cluster%E6%A8%A1%E5%BC%8F%E9%83%A8%E7%BD%B2>
+- <https://github.com/TencentCloud/rocketmq-demo>
+- <https://github.com/apache/rocketmq-spring>
+- <https://github.com/apache/rocketmq-clients>
+- <https://github.com/alibaba/spring-cloud-alibaba>
+- <https://github.com/apache/rocketmq>

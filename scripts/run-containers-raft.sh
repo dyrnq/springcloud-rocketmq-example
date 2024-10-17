@@ -133,17 +133,42 @@ docker run -d \
 --network mynet \
 ${rocketmq_image} mqbroker -c /etc/rocketmq/broker.conf
 done
+}
 
-docker rm -f w1 2>/dev/null || true
+fun_install_rocketmq_dashboard(){
+#docker rm -f w1 2>/dev/null || true
+#docker run -d \
+#--name w1 \
+#--restart always \
+#--network mynet \
+#-e JAVA_OPTS="-Drocketmq.namesrv.addr=n1:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false" \
+#-p 28080:8080 \
+#styletang/rocketmq-console-ng
+
+
+dashboard_url="https://repo.maven.apache.org/maven2/org/apache/rocketmq/rocketmq-dashboard/2.0.0/rocketmq-dashboard-2.0.0.jar"
+dashboard_url="${dashboard_url/repo.maven.apache.org\/maven2/repo.huaweicloud.com/repository/maven}"
+
+curl \
+--retry 5 \
+-o $HOME/rocketmq-dashboard-2.0.0.jar \
+-fSL -# \
+"${dashboard_url}"
+
+docker rm -f w1 2>/dev/null || true;
 docker run -d \
 --name w1 \
 --restart always \
 --network mynet \
--e JAVA_OPTS="-Drocketmq.namesrv.addr=n1:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false" \
+-v $HOME:/data \
 -p 28080:8080 \
-styletang/rocketmq-console-ng
+--entrypoint="" \
+eclipse-temurin:8u422-b05-jre-noble \
+java -jar /data/rocketmq-dashboard-2.0.0.jar \
+--rocketmq.config.namesrvAddrs=n1:9876 \
+--rocketmq.config.namesrvAddr=n1:9876
 }
-
 
 fun_add_mynet
 fun_install_rocketmq
+fun_install_rocketmq_dashboard

@@ -1,5 +1,21 @@
 # springcloud-rocketmq-example
 
+POC new features of rocketmq5
+
+| module             | desc                                                                                 |
+|--------------------|--------------------------------------------------------------------------------------|
+| spring-cloud-v2023 | spring-boot=3.3.4  <br/> spring-cloud=2023.0.3 <br/> spring-cloud-alibaba=2023.0.1.2 |
+| spring-cloud-v2021 | spring-boot=2.7.18 <br/> spring-cloud=2021.0.9 <br/> spring-cloud-alibaba=2021.0.6.0 |
+| sbs                | spring-boot=3.3.4  <br/> rocketmq-spring-boot-starter=2.3.1                          |
+| sbs-v5             | spring-boot=3.3.4  <br/> rocketmq-v5-client-spring-boot-starter=2.3.1                |
+| client-v5          | rocketmq-client-java=5.0.7                                                           |
+
+| scripts                               | desc                                           |
+|---------------------------------------|------------------------------------------------|
+| scripts/run-containers-controller.sh  | 1 namesrv, 1 controller, 2 group 1m1s, 2 proxy |
+| scripts/run-containers.sh             | 1 namesrv, 2 group 1m1s                        |
+| scripts/run-containers-raft.sh        | 1 namesrv, 1 group dLeger(3)                   |
+
 ## 2m2s
 
 ```bash
@@ -48,6 +64,8 @@ root@f2b36aa77e34:/opt/rocketmq/bin# mqadmin topicStatus -n n1:9876 -t book
 q1                         0     0                     0                       
 q3                         0     0                     0                       
 ```
+
+`-w [arg] -r [arg]` for every broker instance, broker default `defaultTopicQueueNums=8`.
 
 ## 2group-raft
 

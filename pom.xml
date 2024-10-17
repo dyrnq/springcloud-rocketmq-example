@@ -14,5 +14,6 @@
         <module>sbs</module>
         <module>sbs-v5</module>
         <module>client-v5</module>
+        <module>client</module>
     </modules>
 </project>

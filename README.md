@@ -4,10 +4,10 @@ POC new features of rocketmq5
 
 | module             | desc                                                                                 |
 |--------------------|--------------------------------------------------------------------------------------|
-| spring-cloud-v2023 | spring-boot=3.3.4  <br/> spring-cloud=2023.0.3 <br/> spring-cloud-alibaba=2023.0.1.2 |
+| spring-cloud-v2023 | spring-boot=3.3.5  <br/> spring-cloud=2023.0.3 <br/> spring-cloud-alibaba=2023.0.1.2 |
 | spring-cloud-v2021 | spring-boot=2.7.18 <br/> spring-cloud=2021.0.9 <br/> spring-cloud-alibaba=2021.0.6.0 |
-| sbs                | spring-boot=3.3.4  <br/> rocketmq-spring-boot-starter=2.3.1                          |
-| sbs-v5             | spring-boot=3.3.4  <br/> rocketmq-v5-client-spring-boot-starter=2.3.1                |
+| sbs                | spring-boot=3.3.5  <br/> rocketmq-spring-boot-starter=2.3.1                          |
+| sbs-v5             | spring-boot=3.3.5  <br/> rocketmq-v5-client-spring-boot-starter=2.3.1                |
 | client             | rocketmq-client=5.3.1                                                                |
 | client-v5          | rocketmq-client-java=5.0.7                                                           |
 

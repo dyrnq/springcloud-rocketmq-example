@@ -6,7 +6,7 @@ iface="${iface:-enp0s8}"
 
 
 wait4x_image="${wait4x_image:-atkrad/wait4x:2.12}"
-rocketmq_image="${rocketmq_image:-dyrnq/rocketmq:5.3.0}"
+rocketmq_image="${rocketmq_image:-dyrnq/rocketmq:5.3.0-jdk21}"
 proxy="${proxy:-}"
 
 while [ $# -gt 0 ]; do
@@ -54,7 +54,7 @@ docker run -d \
 --name n1 \
 --restart always \
 -e TZ="Asia/Shanghai" \
--e JAVA_OPT_EXT="-Duser.home=/home/rocketmq -Xms512m -Xmx512m -Xmn128m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m" \
+-e JAVA_OPT_EXT="-Duser.home=/home/rocketmq -XX:+IgnoreUnrecognizedVMOptions -XX:-UseG1GC -XX:+UseZGC -XX:+PrintFlagsFinal -Xms1g -Xmx1g -Xmn128m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m" \
 -v $HOME/var/lib/n1/logs:/home/rocketmq/logs \
 -v $HOME/var/lib/n1/store:/home/rocketmq/store \
 -p 9876:9876 \
@@ -81,7 +81,7 @@ docker run -d \
 --name c1 \
 --restart always \
 -e TZ="Asia/Shanghai" \
--e JAVA_OPT_EXT="-Duser.home=/home/rocketmq -Xms512m -Xmx512m -Xmn128m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m" \
+-e JAVA_OPT_EXT="-Duser.home=/home/rocketmq -XX:+IgnoreUnrecognizedVMOptions -XX:-UseG1GC -XX:+UseZGC -XX:+PrintFlagsFinal -Xms1g -Xmx1g -Xmn128m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m" \
 -v $HOME/var/lib/c1/logs:/home/rocketmq/logs \
 -v $HOME/var/lib/c1/store:/home/rocketmq/store \
 -v $HOME/var/lib/c1/DLedgerController:/home/rocketmq/DLedgerController \
@@ -157,7 +157,7 @@ docker run -d \
 --name $name \
 --restart always \
 -e TZ="Asia/Shanghai" \
--e JAVA_OPT_EXT="-Duser.home=/home/rocketmq -Xms512m -Xmx512m -Xmn128m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m" \
+-e JAVA_OPT_EXT="-Duser.home=/home/rocketmq -XX:+IgnoreUnrecognizedVMOptions -XX:-UseG1GC -XX:+UseZGC -XX:+PrintFlagsFinal -Xms1g -Xmx1g -Xmn128m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m" \
 -v $HOME/var/lib/$name/logs:/home/rocketmq/logs \
 -v $HOME/var/lib/$name/store:/home/rocketmq/store \
 -v $HOME/$name.conf:/etc/rocketmq/broker.conf \
@@ -202,7 +202,7 @@ docker run -d \
 --name $name \
 --restart always \
 -e TZ="Asia/Shanghai" \
--e JAVA_OPT_EXT="-Duser.home=/home/rocketmq -Xms512m -Xmx512m -Xmn128m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m" \
+-e JAVA_OPT_EXT="-Duser.home=/home/rocketmq -XX:+IgnoreUnrecognizedVMOptions -XX:-UseG1GC -XX:+UseZGC -XX:+PrintFlagsFinal -Xms1g -Xmx1g -Xmn128m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m" \
 -v $HOME/var/lib/$name/logs:/home/rocketmq/logs \
 -v $HOME/var/lib/$name/store:/home/rocketmq/store \
 -v $HOME/$name.json:/etc/rocketmq/proxyConfig.json \

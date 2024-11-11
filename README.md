@@ -11,12 +11,12 @@ POC new features of rocketmq5
 | client             | rocketmq-client=5.3.1                                                                |
 | client-v5          | rocketmq-client-java=5.0.7                                                           |
 
-| scripts                               | desc                                           |
-|---------------------------------------|------------------------------------------------|
-| scripts/run-containers-controller.sh  | 1 namesrv, 1 controller, 2 group 1m1s, 2 proxy |
-| scripts/run-containers.sh             | 1 namesrv, 2 group 1m1s                        |
-| scripts/run-containers-raft.sh        | 1 namesrv, 1 group dLeger(3)                   |
-
+| scripts                               | desc                                               |
+|---------------------------------------|----------------------------------------------------|
+| scripts/run-containers-controller.sh  | 1 namesrv, 1 controller, 2 group 1m1s, 2 proxy     |
+| scripts/run-containers.sh             | 1 namesrv, 2 group 1m1s                            |
+| scripts/run-containers-raft.sh        | 1 namesrv, 1 group dLeger(3)                       |
+| scripts/run-containers-local-proxy.sh | 1 namesrv, 1 controller, 2 group 1m1s, local proxy |
 ## 2m2s
 
 ```bash

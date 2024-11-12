@@ -227,6 +227,8 @@ docker exec -i q1 bash -c "./mqadmin updateTopic -c DefaultCluster -t fifoTopic 
 docker exec -i q1 bash -c "./mqadmin updateTopic -c DefaultCluster -t normalTopic -n n1:9876 -a +message.type=NORMAL"
 docker exec -i q1 bash -c "./mqadmin updateTopic -c DefaultCluster -t transTopic -n n1:9876 -a +message.type=TRANSACTION"
 docker exec -i q1 bash -c "./mqadmin updateTopic -c DefaultCluster -t demo-topic -n n1:9876 -a +message.type=NORMAL"
+docker exec -i q1 bash -c "./mqadmin updateTopic -t topic_a -n n1:9876 --brokerAddr 192.168.88.123:11911 -a +message.type=NORMAL"
+docker exec -i q1 bash -c "./mqadmin updateTopic -t topic_b -n n1:9876 --brokerAddr 192.168.88.123:13911 -a +message.type=NORMAL"
 }
 
 fun_install_rocketmq_dashboard(){

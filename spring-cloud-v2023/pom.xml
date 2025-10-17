@@ -30,7 +30,7 @@
     <properties>
         <java.version>17</java.version>
         <spring-cloud.version>2024.0.2</spring-cloud.version>
-        <spring-cloud-alibaba.version>2023.0.3.2</spring-cloud-alibaba.version>
+        <spring-cloud-alibaba.version>2023.0.3.4</spring-cloud-alibaba.version>
     </properties>
     <dependencies>
         <dependency>

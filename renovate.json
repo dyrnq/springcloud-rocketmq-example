@@ -3,5 +3,8 @@
   "extends": [
     "config:recommended"
   ],
-  "ignorePaths": ["**/spring-cloud-v2021/**"]
+  "ignorePaths": [
+        "**/spring-cloud-v2021/**",
+        "**/spring-cloud-v2023/**"
+    ]
 }

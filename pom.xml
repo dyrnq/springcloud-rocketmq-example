@@ -9,6 +9,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>spring-cloud-v2025</module>
         <module>spring-cloud-v2023</module>
         <module>spring-cloud-v2021</module>
         <module>sbs</module>

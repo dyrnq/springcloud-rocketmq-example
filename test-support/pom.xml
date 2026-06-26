@@ -23,6 +23,12 @@
             <artifactId>rocketmq-client</artifactId>
             <version>5.3.4</version>
         </dependency>
+        <!-- MessageFactory.v5*() and V5Clients return the v5 gRPC types. -->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-client-java</artifactId>
+            <version>5.2.1</version>
+        </dependency>
     </dependencies>
 
     <build>

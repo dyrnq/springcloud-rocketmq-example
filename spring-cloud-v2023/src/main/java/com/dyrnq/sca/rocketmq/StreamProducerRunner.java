@@ -6,11 +6,13 @@ import org.apache.rocketmq.common.message.MessageConst;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("!test")
 @AllArgsConstructor
 @Slf4j
 public class StreamProducerRunner implements ApplicationRunner {
@@ -71,6 +73,7 @@ public class StreamProducerRunner implements ApplicationRunner {
 
             Message<String> info = MessageBuilder.withPayload(outStr)
                     .setHeader(MessageConst.PROPERTY_TAGS, MESSAGE_TAG)
+                    .setHeader(MessageConst.PROPERTY_DELAY_TIME_LEVEL, 19)
                     .build();
             streamBridge.send(CONSUMER_EVENT_OUT_0, info);
 

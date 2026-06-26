@@ -20,13 +20,13 @@ spring:
             # https://github.com/alibaba/spring-cloud-alibaba/wiki/RocketMQ#rocketmq-provider-properties
             producer:
               sync: false
-              #              compressMsgBodyOverHowmuch:
+#              compressMsgBodyOverHowmuch:
               compressMessageBodyThreshold: 900009
               compressMsgBodyThreshold: 5097
 #              sendMsgTimeout: 1
 #              sendMessageTimeout: 6000
-      #              retryTimesWhenSendFailed: 10
-      #              retryTimesWhenSendAsyncFailed: 10
+#              retryTimesWhenSendFailed: 10
+#              retryTimesWhenSendAsyncFailed: 10
       bindings:
         consumerEvent-out-0:
           destination: demo

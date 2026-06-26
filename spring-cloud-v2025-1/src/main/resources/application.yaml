@@ -1,0 +1,52 @@
+spring:
+  main:
+    web-application-type: none
+  cloud:
+    stream:
+      rocketmq:
+        binder:
+          name-server: 192.168.88.123:9876;
+          group: demo
+        bindings:
+          consumerEvent-in-0:
+            # https://github.com/alibaba/spring-cloud-alibaba/wiki/RocketMQ#rocketmq-consumer-properties
+            subscription: test
+            consumer:
+              maxConcurrency: 10
+              prefetch: 10
+              push:
+                max-reconsume-times: 2
+          consumerEvent-out-0:
+            # https://github.com/alibaba/spring-cloud-alibaba/wiki/RocketMQ#rocketmq-provider-properties
+            producer:
+              sync: false
+              #              compressMsgBodyOverHowmuch:
+              compressMessageBodyThreshold: 900009
+              compressMsgBodyThreshold: 5097
+#              sendMsgTimeout: 1
+#              sendMessageTimeout: 6000
+      #              retryTimesWhenSendFailed: 10
+      #              retryTimesWhenSendAsyncFailed: 10
+      bindings:
+        consumerEvent-out-0:
+          destination: demo
+          content-type: text/plain;charset=UTF-8
+          # content-type: application/json
+          group: demo-group
+
+        consumerEvent-in-0:
+          destination: demo
+          content-type: text/plain;charset=UTF-8
+          # content-type: application/json
+          group: demo-group
+          consumer:
+            concurrency: 3
+            maxAttempts: 1
+
+      function:
+        definition: consumerEvent
+logging:
+  level:
+    root: INFO
+  file:
+    name: logs/myapp.log

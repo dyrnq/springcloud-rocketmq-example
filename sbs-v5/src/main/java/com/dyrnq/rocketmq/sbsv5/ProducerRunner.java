@@ -13,6 +13,7 @@ import org.apache.rocketmq.client.core.RocketMQClientTemplate;
 import org.apache.rocketmq.client.core.RocketMQTransactionChecker;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Component
+@Profile("!test")
 @RequiredArgsConstructor
 @Slf4j
 public class ProducerRunner implements CommandLineRunner {

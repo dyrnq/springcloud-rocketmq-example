@@ -28,16 +28,16 @@ Test counts are the current snapshot — numbers shift as new tests are added.
 
 | Module               | Tests                                                                                                                                  | Count |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| `client`             | `AdminToolTest`, `DelayLevelTest`, `PushConsumeTest`, `SyncSendTest`                                                                   | 4     |
-| `client-v5`          | `AsyncSendTest`, `AsyncSimpleConsumeTest`, `DelayTimestampTest`, `FifoMessageTest`, `PushConsumeTest`, `SimpleConsumeTest`, `SyncSendTest`, `TransactionalSendTest` | 8 |
+| `client`             | `AdminToolTest`, `DelayLevelTest`, `OrderlyConsumeTest`, `PushConsumeTest`, `ReconsumeTest`, `SyncSendTest`                           | 6     |
+| `client-v5`          | `AsyncSendTest`, `AsyncSimpleConsumeTest`, `DelayTimestampTest`, `FifoMessageTest`, `MessageKeysTest`, `PushConsumeTest`, `SimpleConsumeTest`, `SyncSendTest`, `TransactionalSendTest`, `TransactionRollbackTest` | 10 |
 | `sbs`                | `ContextLoadsTest`, `DelayLevelTest`, `DelayTimestampTest`, `PushConsumeTest`, `SyncSendTest`                                          | 5     |
 | `sbs-v5`             | `AsyncDelayTimestampTest`, `AsyncSendTest`, `ContextLoadsTest`, `DelayTimestampTest`, `FifoMessageTest`, `PushConsumeTest`, `SyncSendTest`, `TransactionalSendTest` | 8 |
 | `spring-cloud-v2021` | `AsyncSendTest`, `ContextLoadsTest`, `PushConsumeTest`                                                                                 | 3     |
-| `spring-cloud-v2023` | `AsyncSendTest`, `ContextLoadsTest`, `PushConsumeTest`                                                                                 | 3     |
+| `spring-cloud-v2023` | `AsyncSendTest`, `BinderTagHeaderTest`, `ContextLoadsTest`, `PushConsumeTest`                                                           | 4     |
 | `spring-cloud-v2025` | `AsyncSendTest`, `ContextLoadsTest`, `PushConsumeTest`                                                                                 | 3     |
 | `spring-cloud-v2025-1` | `AsyncSendTest`, `ContextLoadsTest`, `PushConsumeTest`                                                                               | 3     |
 
-Total: **37 tests** across 8 modules.
+Total: **42 tests** across 8 modules.
 
 ## Test dimensions covered
 
@@ -54,6 +54,11 @@ supports them:
 | FIFO            | Messages with the same `MessageGroup` arrive in send order, single consumer       | (V4 FIFO is topic-level, not group)   | `MessageBuilder.setMessageGroup(...)`                 |
 | Transaction     | Local transaction state transitions COMMIT / ROLLBACK are observable              | `TransactionMQProducer`               | `RocketMQClientTemplate.sendMessageInTransaction`     |
 | Simple consume  | `SimpleConsumer.receive()` returns the expected message body                      | n/a                                   | `SimpleConsumer.builder()...build()`                  |
+| Orderly consume | `MessageListenerOrderly` receives all messages from a queue in send order         | `MessageListenerOrderly`              | n/a                                                   |
+| Reconsume       | Listener returning `RECONSUME_LATER` causes broker redelivery; `getReconsumeTimes()` increments | `ConsumeConcurrentlyStatus.RECONSUME_LATER` | n/a                                            |
+| Keys round-trip | Producer-side `setKeys` is preserved by broker and visible via `MessageView.getKeys()` | n/a                                 | `MessageBuilder.setKeys(...)`                         |
+| TX rollback     | `tx.rollback()` causes broker to discard the half-committed message               | n/a                                   | `Transaction.rollback()`                              |
+| Binder tag      | `MessageConst.PROPERTY_TAGS` header reaches the broker and is visible to a raw V4 consumer | n/a                              | n/a (header set in Spring Cloud Stream producer)      |
 
 ## Key test patterns
 
@@ -167,6 +172,31 @@ class AsyncSendTest {
 
 `ContextLoadsTest` in every spring-cloud-v* and sbs module is a bare `@SpringBootTest`
 sanity check — verifies that auto-config + binder wiring resolves without throwing.
+
+### 6. V5 test-support helpers (`com.dyrnq.rocketmq.testsupport`)
+
+The V5 tests share a small set of builders so the gRPC client wiring boilerplate
+(`ClientConfiguration.newBuilder().setEndpoints(...).build()`, long-poll subscriptions,
+filter expressions) lives in one place:
+
+```java
+// Open a producer pre-wired to Addresses.PROXY with the topic pre-fetched
+Producer producer = V5Clients.producer(Topics.TOPIC_NORMAL);
+
+// Open a SimpleConsumer with a 15-second long-poll and a tag filter
+SimpleConsumer consumer = V5Clients.simpleConsumer(
+    Groups.uniqueSimple(), Topics.TOPIC_NORMAL, "yourMessageTagA");
+
+// Build a V5 message with a unique body marker
+Message message = MessageFactory.v5(Topics.TOPIC_NORMAL);
+
+// Decode a V5 MessageView body as UTF-8 (getBody() returns ByteBuffer, not byte[])
+String body = MessageViewBytes.toString(messageView);
+```
+
+Used by `AsyncSendTest`, `AsyncSimpleConsumeTest`, `DelayTimestampTest`, `FifoMessageTest`,
+`MessageKeysTest`, `PushConsumeTest`, `SimpleConsumeTest`, `SyncSendTest`,
+`TransactionalSendTest`, `TransactionRollbackTest` (every V5 test in `client-v5`).
 
 ## Known flaky tests
 

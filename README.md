@@ -170,6 +170,17 @@ Table 1. Release train Spring Boot compatibility (see here for more detailed inf
 | Dalston                  | 1.5.x                                 |
 
 
+## Documentation
+
+Project documentation lives in [`docs/`](docs/README.md):
+
+- [`docs/local-development.md`](docs/local-development.md) — Vagrant VM topology, broker scripts, how to bring up the environment used by every test.
+- [`docs/modules.md`](docs/modules.md) — The 9 Maven modules, the dependency matrix, what each module exercises.
+- [`docs/testing.md`](docs/testing.md) — The test matrix per module, key patterns (raw V4 push consumer, body-marker filter for delay, V5 SimpleConsumer long-poll), how to run them.
+- [`docs/test-support.md`](docs/test-support.md) — The `test-support` shared module — `Addresses`, `Topics`, `Groups`, `MessageFactory`, `ReceiptAwaiter`.
+- [`docs/formatting.md`](docs/formatting.md) — Spotless + google-java-format setup, why the version pins, vendored-file policy.
+- [`docs/ci.md`](docs/ci.md) — The `.github/workflows/maven.yml` pipeline — Spotless gate, JDK 21, Maven build.
+
 
 ## ref
 - <https://rocketmq.apache.org/zh/docs/deploymentOperations/01deploy/#cluster%E6%A8%A1%E5%BC%8F%E9%83%A8%E7%BD%B2>

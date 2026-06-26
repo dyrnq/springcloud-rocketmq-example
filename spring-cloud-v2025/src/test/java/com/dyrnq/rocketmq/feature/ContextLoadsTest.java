@@ -5,15 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-/**
- * Verifies the Spring Boot context boots cleanly for {@code spring-cloud-v2025}.
- */
+/** Verifies the Spring Boot context boots cleanly for {@code spring-cloud-v2025}. */
 @SpringBootTest(classes = RocketmqApplication.class)
 @ActiveProfiles("test")
 class ContextLoadsTest {
 
-    @Test
-    void contextLoads() {
-        // If the context fails to start, this test errors out automatically.
-    }
+  @Test
+  void contextLoads() {
+    // If the context fails to start, this test errors out automatically.
+  }
 }

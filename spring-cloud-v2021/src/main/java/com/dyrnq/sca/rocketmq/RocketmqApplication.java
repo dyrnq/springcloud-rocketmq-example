@@ -11,12 +11,12 @@ import org.springframework.messaging.converter.MessageConverter;
 @Slf4j
 public class RocketmqApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(RocketmqApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(RocketmqApplication.class, args);
+  }
 
-    @Bean
-    public MessageConverter customMessageConverter() {
-        return new ObjectStringMessageConverter();
-    }
+  @Bean
+  public MessageConverter customMessageConverter() {
+    return new ObjectStringMessageConverter();
+  }
 }

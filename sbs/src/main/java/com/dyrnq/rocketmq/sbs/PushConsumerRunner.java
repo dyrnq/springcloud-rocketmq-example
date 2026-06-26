@@ -14,15 +14,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class PushConsumerRunner implements CommandLineRunner {
-    @Override
-    public void run(String... args) {
-    }
+  @Override
+  public void run(String... args) {}
 
-    @Service
-    @RocketMQMessageListener(topic = "demo-topic", consumerGroup = "demo-group")
-    public static class DemoConsumer implements RocketMQListener<String> {
-        public void onMessage(String message) {
-            log.info("received message: {}", message);
-        }
+  @Service
+  @RocketMQMessageListener(topic = "demo-topic", consumerGroup = "demo-group")
+  public static class DemoConsumer implements RocketMQListener<String> {
+    public void onMessage(String message) {
+      log.info("received message: {}", message);
     }
+  }
 }

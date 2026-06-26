@@ -14,14 +14,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Slf4j
 public class ProducerRunner implements CommandLineRunner {
-    private final RocketMQTemplate rocketMQTemplate;
+  private final RocketMQTemplate rocketMQTemplate;
 
-    @Value("${rocketmq.producer.simple.demo.topic}")
-    private String topic;
+  @Value("${rocketmq.producer.simple.demo.topic}")
+  private String topic;
 
-    @Override
-    public void run(String... args) throws Exception {
-        SendResult sendResult = rocketMQTemplate.syncSend(topic, "Hello, World!");
-        log.info("{}", sendResult);
-    }
+  @Override
+  public void run(String... args) throws Exception {
+    SendResult sendResult = rocketMQTemplate.syncSend(topic, "Hello, World!");
+    log.info("{}", sendResult);
+  }
 }

@@ -29,65 +29,70 @@ import org.apache.rocketmq.client.apis.producer.TransactionChecker;
 /**
  * Each client will establish an independent connection to the server node within a process.
  *
- * <p>In most cases, the singleton mode can meet the requirements of higher concurrency.
- * If multiple connections are desired, consider increasing the number of clients appropriately.
+ * <p>In most cases, the singleton mode can meet the requirements of higher concurrency. If multiple
+ * connections are desired, consider increasing the number of clients appropriately.
  */
 public class ProducerSingleton {
-    private static volatile Producer PRODUCER;
-    private static volatile Producer TRANSACTIONAL_PRODUCER;
-    private static final String ACCESS_KEY = "yourAccessKey";
-    private static final String SECRET_KEY = "yourSecretKey";
-    private static final String ENDPOINTS = "192.168.88.123:8181";
+  private static volatile Producer PRODUCER;
+  private static volatile Producer TRANSACTIONAL_PRODUCER;
+  private static final String ACCESS_KEY = "yourAccessKey";
+  private static final String SECRET_KEY = "yourSecretKey";
+  private static final String ENDPOINTS = "192.168.88.123:8181";
 
-    private ProducerSingleton() {
-    }
+  private ProducerSingleton() {}
 
-    private static Producer buildProducer(TransactionChecker checker, String... topics) throws ClientException {
-        final ClientServiceProvider provider = ClientServiceProvider.loadService();
-        // Credential provider is optional for client configuration.
-        // This parameter is necessary only when the server ACL is enabled. Otherwise,
-        // it does not need to be set by default.
-        SessionCredentialsProvider sessionCredentialsProvider =
-            new StaticSessionCredentialsProvider(ACCESS_KEY, SECRET_KEY);
-        ClientConfiguration clientConfiguration = ClientConfiguration.newBuilder()
+  private static Producer buildProducer(TransactionChecker checker, String... topics)
+      throws ClientException {
+    final ClientServiceProvider provider = ClientServiceProvider.loadService();
+    // Credential provider is optional for client configuration.
+    // This parameter is necessary only when the server ACL is enabled. Otherwise,
+    // it does not need to be set by default.
+    SessionCredentialsProvider sessionCredentialsProvider =
+        new StaticSessionCredentialsProvider(ACCESS_KEY, SECRET_KEY);
+    ClientConfiguration clientConfiguration =
+        ClientConfiguration.newBuilder()
             .setEndpoints(ENDPOINTS)
-            // On some Windows platforms, you may encounter SSL compatibility issues. Try turning off the SSL option in
+            // On some Windows platforms, you may encounter SSL compatibility issues. Try turning
+            // off the SSL option in
             // client configuration to solve the problem please if SSL is not essential.
             // .enableSsl(false)
             .setCredentialProvider(sessionCredentialsProvider)
             .build();
-        final ProducerBuilder builder = provider.newProducerBuilder()
+    final ProducerBuilder builder =
+        provider
+            .newProducerBuilder()
             .setClientConfiguration(clientConfiguration)
-            // Set the topic name(s), which is optional but recommended. It makes producer could prefetch
+            // Set the topic name(s), which is optional but recommended. It makes producer could
+            // prefetch
             // the topic route before message publishing.
             .setTopics(topics);
-        if (checker != null) {
-            // Set the transaction checker.
-            builder.setTransactionChecker(checker);
-        }
-        return builder.build();
+    if (checker != null) {
+      // Set the transaction checker.
+      builder.setTransactionChecker(checker);
     }
+    return builder.build();
+  }
 
-    public static Producer getInstance(String... topics) throws ClientException {
+  public static Producer getInstance(String... topics) throws ClientException {
+    if (null == PRODUCER) {
+      synchronized (ProducerSingleton.class) {
         if (null == PRODUCER) {
-            synchronized (ProducerSingleton.class) {
-                if (null == PRODUCER) {
-                    PRODUCER = buildProducer(null, topics);
-                }
-            }
+          PRODUCER = buildProducer(null, topics);
         }
-        return PRODUCER;
+      }
     }
+    return PRODUCER;
+  }
 
-    public static Producer getTransactionalInstance(TransactionChecker checker,
-        String... topics) throws ClientException {
+  public static Producer getTransactionalInstance(TransactionChecker checker, String... topics)
+      throws ClientException {
+    if (null == TRANSACTIONAL_PRODUCER) {
+      synchronized (ProducerSingleton.class) {
         if (null == TRANSACTIONAL_PRODUCER) {
-            synchronized (ProducerSingleton.class) {
-                if (null == TRANSACTIONAL_PRODUCER) {
-                    TRANSACTIONAL_PRODUCER = buildProducer(checker, topics);
-                }
-            }
+          TRANSACTIONAL_PRODUCER = buildProducer(checker, topics);
         }
-        return TRANSACTIONAL_PRODUCER;
+      }
     }
+    return TRANSACTIONAL_PRODUCER;
+  }
 }

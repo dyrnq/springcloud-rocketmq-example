@@ -18,9 +18,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Verifies {@code ClientConfigurationBuilder.setRequestTimeout} is applied to the client
- * configuration and a normal send still succeeds. The deadline behaviour itself cannot be
- * asserted deterministically against a fast local broker, so this test avoids a timing-based
- * failure.
+ * configuration and a normal send still succeeds. The deadline behaviour itself cannot be asserted
+ * deterministically against a fast local broker, so this test avoids a timing-based failure.
  */
 class RequestTimeoutTest {
 

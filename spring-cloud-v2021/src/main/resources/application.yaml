@@ -16,10 +16,12 @@ spring:
               prefetch: 10
               push:
                 max-reconsume-times: 2
+                orderly: true
           consumerEvent-out-0:
             # https://github.com/alibaba/spring-cloud-alibaba/wiki/RocketMQ#rocketmq-provider-properties
             producer:
               sync: false
+              messageQueueSelector: fifoMessageQueueSelector
               #              compressMsgBodyOverHowmuch:
               compressMessageBodyThreshold: 900009
               compressMsgBodyThreshold: 5097

@@ -3,11 +3,12 @@ package com.dyrnq.sca.rocketmq;
 // import com.alibaba.fastjson2.JSON;
 // import com.alibaba.fastjson2.JSONObject;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.MessageExt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -16,8 +17,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile("!test")
-@Slf4j
 public class StreamConsumerRunner implements ApplicationRunner {
+  private static final Logger log = LoggerFactory.getLogger(StreamConsumerRunner.class);
 
   @Value("${spring.cloud.stream.rocketmq.binder.name-server}")
   private String rocketmqNameSrv;

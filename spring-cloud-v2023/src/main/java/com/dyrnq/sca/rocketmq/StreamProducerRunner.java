@@ -1,8 +1,8 @@
 package com.dyrnq.sca.rocketmq;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.common.message.MessageConst;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -13,12 +13,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile("!test")
-@AllArgsConstructor
-@Slf4j
 public class StreamProducerRunner implements ApplicationRunner {
+  private static final Logger log = LoggerFactory.getLogger(StreamProducerRunner.class);
+
   private static final String CONSUMER_EVENT_OUT_0 = "consumerEvent-out-0";
   private static final String MESSAGE_TAG = "test";
   private final StreamBridge streamBridge;
+
+  public StreamProducerRunner(StreamBridge streamBridge) {
+    this.streamBridge = streamBridge;
+  }
 
   public static String genFixedString(int charCount) {
     byte[] byteArray = new byte[charCount];

@@ -63,7 +63,7 @@ supports them:
 | SQL92 filter    | Consumer receives only messages whose user property satisfies the SQL expression | `MessageSelector.bySql(...)`, `Message.putUserProperty` | n/a (not exercised)                 |
 | Broadcast consume | A broadcast push consumer receives the message without queue rebalance          | `DefaultMQPushConsumer.setMessageModel(BROADCASTING)` | n/a                                      |
 | POP nack / invisible time | `changeInvisibleDuration(view, Duration.ZERO)` requeues and redelivers the message | n/a                             | `SimpleConsumer.changeInvisibleDuration(view, Duration.ZERO)` |
-| gRPC request timeout | `setRequestTimeout` deadline surfaces as a timeout/deadline exception instead of hanging | n/a | `RequestTimeoutTest` (500ms deadline, large body) |
+| gRPC request timeout | `setRequestTimeout` round-trips through `ClientConfiguration` and a normal send succeeds | n/a | `RequestTimeoutTest` (5s deadline, small body) |
 | gRPC startup attempts | `setMaxStartupAttempts` gives up after the configured route-fetch attempts and reports the count | n/a | `MaxStartupAttemptsTest` (unreachable endpoint) |
 
 `AdminToolTest` additionally asserts the broker-side topic attributes created by the

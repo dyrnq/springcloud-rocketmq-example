@@ -28,10 +28,15 @@ public final class V5Clients {
    * (recommended for throughput but optional).
    */
   public static Producer producer(String topic) throws Exception {
+    return producer(topic, clientConfiguration());
+  }
+
+  public static Producer producer(String topic, ClientConfiguration configuration)
+      throws Exception {
     ClientServiceProvider provider = ClientServiceProvider.loadService();
     return provider
         .newProducerBuilder()
-        .setClientConfiguration(clientConfiguration())
+        .setClientConfiguration(configuration)
         .setTopics(topic)
         .build();
   }

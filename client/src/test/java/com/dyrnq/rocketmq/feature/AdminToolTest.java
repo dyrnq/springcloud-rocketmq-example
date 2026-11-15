@@ -8,6 +8,7 @@ import com.dyrnq.rocketmq.testsupport.Addresses;
 import com.dyrnq.rocketmq.testsupport.Topics;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.TopicConfig;
+import org.apache.rocketmq.common.attribute.TopicMessageType;
 import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,5 +52,22 @@ class AdminToolTest {
     assertEquals(Topics.TOPIC_A, config.getTopicName());
     assertTrue(config.getReadQueueNums() > 0, "Topic should have at least 1 read queue");
     assertTrue(config.getWriteQueueNums() > 0, "Topic should have at least 1 write queue");
+  }
+
+  @Test
+  void delayAndFifoTopicMessageTypesAreSet() throws Exception {
+    TopicConfig delayConfig = admin.examineTopicConfig(Addresses.BROKER_ADDR_1, Topics.TOPIC_DELAY);
+    assertNotNull(delayConfig, "TopicConfig for " + Topics.TOPIC_DELAY + " should not be null");
+    assertEquals(
+        TopicMessageType.DELAY,
+        delayConfig.getTopicMessageType(),
+        Topics.TOPIC_DELAY + " should be message.type=DELAY");
+
+    TopicConfig fifoConfig = admin.examineTopicConfig(Addresses.BROKER_ADDR_1, Topics.TOPIC_FIFO);
+    assertNotNull(fifoConfig, "TopicConfig for " + Topics.TOPIC_FIFO + " should not be null");
+    assertEquals(
+        TopicMessageType.FIFO,
+        fifoConfig.getTopicMessageType(),
+        Topics.TOPIC_FIFO + " should be message.type=FIFO");
   }
 }

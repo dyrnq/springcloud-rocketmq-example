@@ -29,7 +29,7 @@ Test counts are the current snapshot — numbers shift as new tests are added.
 | Module               | Tests                                                                                                                                  | Count |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----- |
 | `client`             | `AdminToolTest`, `DelayLevelTest`, `OrderlyConsumeTest`, `PushConsumeTest`, `ReconsumeTest`, `SyncSendTest`, `BatchSendTest`, `SqlFilterConsumeTest`, `BroadcastConsumeTest` | 9 |
-| `client-v5`          | `AsyncSendTest`, `AsyncSimpleConsumeTest`, `DelayTimestampTest`, `FifoMessageTest`, `MessageKeysTest`, `PushConsumeTest`, `SimpleConsumeTest`, `SyncSendTest`, `TransactionalSendTest`, `TransactionRollbackTest`, `PopNackChangeInvisibleDurationTest` | 11 |
+| `client-v5`          | `AsyncSendTest`, `AsyncSimpleConsumeTest`, `DelayTimestampTest`, `FifoMessageTest`, `MaxStartupAttemptsTest`, `MessageKeysTest`, `PushConsumeTest`, `RequestTimeoutTest`, `SimpleConsumeTest`, `SyncSendTest`, `TransactionalSendTest`, `TransactionRollbackTest`, `PopNackChangeInvisibleDurationTest` | 13 |
 | `sbs`                | `ContextLoadsTest`, `DelayLevelTest`, `DelayTimestampTest`, `PushConsumeTest`, `SyncSendTest`                                          | 5     |
 | `sbs-v5`             | `AsyncDelayTimestampTest`, `AsyncSendTest`, `ContextLoadsTest`, `DelayTimestampTest`, `FifoMessageTest`, `PushConsumeTest`, `SyncSendTest`, `TransactionalSendTest` | 8 |
 | `spring-cloud-v2021` | `AsyncSendTest`, `ContextLoadsTest`, `PushConsumeTest`                                                                                 | 3     |
@@ -37,7 +37,7 @@ Test counts are the current snapshot — numbers shift as new tests are added.
 | `spring-cloud-v2025` | `AsyncSendTest`, `ContextLoadsTest`, `PushConsumeTest`                                                                                 | 3     |
 | `spring-cloud-v2025-1` | `AsyncSendTest`, `ContextLoadsTest`, `PushConsumeTest`                                                                               | 3     |
 
-Total: **46 tests** across 8 modules.
+Total: **48 tests** across 8 modules.
 
 ## Test dimensions covered
 
@@ -53,7 +53,7 @@ supports them:
 | Delay (time)    | Message with `setDeliverTimeMs(now+Δ)` is delivered at approximately `now+Δ`     | `Message.setDeliverTimeMs(...)`        | `syncSendDelayMessage(topic, body, Duration)`         |
 | FIFO            | Messages with the same `MessageGroup` arrive in send order, single consumer       | (V4 FIFO is topic-level, not group)   | `MessageBuilder.setMessageGroup(...)`                 |
 | Transaction     | Local transaction state transitions COMMIT / ROLLBACK are observable              | `TransactionMQProducer`               | `RocketMQClientTemplate.sendMessageInTransaction`     |
-| Simple consume  | `SimpleConsumer.receive()` returns the expected message body                      | n/a                                   | `SimpleConsumer.builder()...build()`                  |
+| Simple consume  | `SimpleConsumer.receive()` + `ack()` (RocketMQ 5 POP / pull-on-demand mode) returns the expected message body | n/a | `SimpleConsumer.builder()...build()`                  |
 | Orderly consume | `MessageListenerOrderly` receives all messages from a queue in send order         | `MessageListenerOrderly`              | n/a                                                   |
 | Reconsume       | Listener returning `RECONSUME_LATER` causes broker redelivery; `getReconsumeTimes()` increments | `ConsumeConcurrentlyStatus.RECONSUME_LATER` | n/a                                            |
 | Keys round-trip | Producer-side `setKeys` is preserved by broker and visible via `MessageView.getKeys()` | n/a                                 | `MessageBuilder.setKeys(...)`                         |
@@ -63,6 +63,12 @@ supports them:
 | SQL92 filter    | Consumer receives only messages whose user property satisfies the SQL expression | `MessageSelector.bySql(...)`, `Message.putUserProperty` | n/a (not exercised)                 |
 | Broadcast consume | A broadcast push consumer receives the message without queue rebalance          | `DefaultMQPushConsumer.setMessageModel(BROADCASTING)` | n/a                                      |
 | POP nack / invisible time | `changeInvisibleDuration(view, Duration.ZERO)` requeues and redelivers the message | n/a                             | `SimpleConsumer.changeInvisibleDuration(view, Duration.ZERO)` |
+| gRPC request timeout | `setRequestTimeout` deadline surfaces as a timeout/deadline exception instead of hanging | n/a | `RequestTimeoutTest` (500ms deadline, large body) |
+| gRPC startup attempts | `setMaxStartupAttempts` gives up after the configured route-fetch attempts and reports the count | n/a | `MaxStartupAttemptsTest` (unreachable endpoint) |
+
+`AdminToolTest` additionally asserts the broker-side topic attributes created by the
+CI/local scripts: `delayTopic` is `message.type=DELAY` and `fifoTopic` is
+`message.type=FIFO`.
 
 ## Key test patterns
 

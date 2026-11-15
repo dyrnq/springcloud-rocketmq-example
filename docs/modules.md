@@ -12,8 +12,8 @@ springcloud-rocketmq-example/                      ← root pom, packaging=pom, 
 ├── spring-cloud-v2021/                            ← Spring Boot 2.7.18 + Spring Cloud Stream binder
 ├── sbs/                                           ← Spring Boot 3.5.9 + rocketmq-spring-boot-starter (V4)
 ├── sbs-v5/                                        ← Spring Boot 3.5.9 + rocketmq-v5-client-spring-boot-starter
-├── client-v5/                                     ← rocketmq-client-java 5.2.1 (raw V5 gRPC)
-└── client/                                        ← rocketmq-client 5.3.4 (raw V4 Remoting)
+├── client-v5/                                     ← rocketmq-client-java 5.2.2 (raw V5 gRPC)
+└── client/                                        ← rocketmq-client 5.5.1 (raw V4 Remoting)
 ```
 
 ## What each module exercises
@@ -26,8 +26,8 @@ springcloud-rocketmq-example/                      ← root pom, packaging=pom, 
 | `spring-cloud-v2021`   | 2.7.18      | 2021.0.9     | 2021.0.6.0           | (transitive via alibaba) | Spring Boot 2.7.x — last generation on javax/jakarta boundary. Test-binder dependency is **commented out** (incompatible with 2.7.x). |
 | `sbs`                | 3.5.9       | —            | —                    | rocketmq-spring-boot-starter 2.3.6 (V4) | Starter (no Spring Cloud Stream).                                                                       |
 | `sbs-v5`             | 3.5.9       | —            | —                    | rocketmq-v5-client-spring-boot-starter 2.3.6 | V5 starter.                                                                                             |
-| `client-v5`          | —           | —            | —                    | rocketmq-client-java 5.2.1 (gRPC)         | Raw V5 client, no Spring. JUnit 5 standalone.                                                          |
-| `client`             | —           | —            | —                    | rocketmq-client 5.3.4 (Remoting)          | Raw V4 client, no Spring. JUnit 5 standalone. Includes admin / ACL examples.                          |
+| `client-v5`          | —           | —            | —                    | rocketmq-client-java 5.2.2 (gRPC)         | Raw V5 client, no Spring. JUnit 5 standalone.                                                          |
+| `client`             | —           | —            | —                    | rocketmq-client 5.5.1 (Remoting)          | Raw V4 client, no Spring. JUnit 5 standalone. Includes admin / ACL examples.                          |
 
 `spring-cloud-v*` and `sbs*` modules inherit dependency management from
 `spring-boot-starter-parent`; `client` and `client-v5` do not (no Spring Boot) and

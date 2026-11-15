@@ -1,7 +1,7 @@
 # Formatting
 
-Code style is enforced by [Spotless 2.43.0](https://github.com/diffplug/spotless) using
-[google-java-format 1.18.0](https://github.com/google/google-java-format). Both
+Code style is enforced by [Spotless 3.11.0](https://github.com/diffplug/spotless) using
+[google-java-format 1.36.1](https://github.com/google/google-java-format). Both
 versions are **pinned explicitly** in the root `pom.xml` so a future Spotless upgrade
 cannot silently swap in google-java-format 2.x (which has subtly different behaviour in
 lambda/switch/import-grouping cases).
@@ -54,11 +54,11 @@ The root `pom.xml` declares:
     <plugin>
       <groupId>com.diffplug.spotless</groupId>
       <artifactId>spotless-maven-plugin</artifactId>
-      <version>2.43.0</version>
+      <version>3.11.0</version>
       <configuration>
         <java>
           <googleJavaFormat>
-            <version>1.18.0</version>
+            <version>1.36.1</version>
             <style>GOOGLE</style>
           </googleJavaFormat>
           <removeUnusedImports/>

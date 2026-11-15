@@ -71,7 +71,7 @@
                 <configuration>
                     <java>
                         <googleJavaFormat>
-                            <version>1.18.0</version>
+                            <version>1.36.1</version>
                             <style>GOOGLE</style>
                         </googleJavaFormat>
                         <removeUnusedImports/>

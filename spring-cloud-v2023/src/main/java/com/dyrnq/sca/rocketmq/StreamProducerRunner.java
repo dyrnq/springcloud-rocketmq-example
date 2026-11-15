@@ -53,7 +53,8 @@ public class StreamProducerRunner implements ApplicationRunner {
       //                    .setHeader(MessageConst.PROPERTY_TAGS, MESSAGE_TAG) //  <1> 设置 Tag
       //                    .build();
 
-      String myStr = """
+      String myStr =
+          """
                     {"body":"%s","index":%d}
                     """;
 

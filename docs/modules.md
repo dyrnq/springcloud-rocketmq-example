@@ -6,12 +6,12 @@ integration layer (raw client vs Spring Boot starter vs Spring Cloud Stream bind
 ```
 springcloud-rocketmq-example/                      ← root pom, packaging=pom, aggregator only
 ├── test-support/                                  ← shared test constants; test scope only
-├── spring-cloud-v2025-1/                          ← Spring Boot 4.1.0 + Spring Cloud Stream binder
-├── spring-cloud-v2025/                            ← Spring Boot 3.5.9 + Spring Cloud Stream binder
+├── spring-cloud-v2025-1/                          ← Spring Boot 4.1.2 + Spring Cloud Stream binder
+├── spring-cloud-v2025/                            ← Spring Boot 3.5.16 + Spring Cloud Stream binder
 ├── spring-cloud-v2023/                            ← Spring Boot 3.3.13 + Spring Cloud Stream binder
 ├── spring-cloud-v2021/                            ← Spring Boot 2.7.18 + Spring Cloud Stream binder
-├── sbs/                                           ← Spring Boot 3.5.9 + rocketmq-spring-boot-starter (V4)
-├── sbs-v5/                                        ← Spring Boot 3.5.9 + rocketmq-v5-client-spring-boot-starter
+├── sbs/                                           ← Spring Boot 3.5.16 + rocketmq-spring-boot-starter (V4)
+├── sbs-v5/                                        ← Spring Boot 3.5.16 + rocketmq-v5-client-spring-boot-starter
 ├── client-v5/                                     ← rocketmq-client-java 5.2.2 (raw V5 gRPC)
 └── client/                                        ← rocketmq-client 5.5.1 (raw V4 Remoting)
 ```
@@ -20,18 +20,18 @@ springcloud-rocketmq-example/                      ← root pom, packaging=pom, 
 
 | Module               | Spring Boot | Spring Cloud | Spring Cloud Alibaba | RocketMQ client          | Notes                                                                                                  |
 | -------------------- | ----------- | ------------ | -------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------ |
-| `spring-cloud-v2025-1` | 4.1.0       | 2025.1.2     | 2025.1.0.0           | (transitive via alibaba) | Latest generation. Spring Boot 4.x removed `SpyBean`; tests use `MockitoSpyBean` from spring-test 6.2.5. |
-| `spring-cloud-v2025`   | 3.5.9       | 2025.0.1     | 2025.0.0.0           | (transitive via alibaba) | Same code shape as 2025-1, but on Spring Boot 3.5.x. Still uses the legacy `SpyBean`.                  |
+| `spring-cloud-v2025-1` | 4.1.2       | 2025.1.4     | 2025.1.0.0           | (transitive via alibaba) | Latest generation. Spring Boot 4.x removed `SpyBean`; tests use `MockitoSpyBean` from spring-test 6.2.5. |
+| `spring-cloud-v2025`   | 3.5.16      | 2025.0.3     | 2025.0.0.0           | (transitive via alibaba) | Same code shape as 2025-1, but on Spring Boot 3.5.x. Still uses the legacy `SpyBean`.                  |
 | `spring-cloud-v2023`   | 3.3.13      | 2023.0.6     | 2023.0.3.4           | (transitive via alibaba) | Mid-generation baseline.                                                                               |
-| `spring-cloud-v2021`   | 2.7.18      | 2021.0.9     | 2021.0.6.0           | (transitive via alibaba) | Spring Boot 2.7.x — last generation on javax/jakarta boundary. Test-binder dependency is **commented out** (incompatible with 2.7.x). |
-| `sbs`                | 3.5.9       | —            | —                    | rocketmq-spring-boot-starter 2.3.6 (V4) | Starter (no Spring Cloud Stream).                                                                       |
-| `sbs-v5`             | 3.5.9       | —            | —                    | rocketmq-v5-client-spring-boot-starter 2.3.6 | V5 starter.                                                                                             |
+| `spring-cloud-v2021`   | 2.7.18      | 2021.0.9     | 2021.0.6.2           | (transitive via alibaba) | Spring Boot 2.7.x — last generation on javax/jakarta boundary. Test-binder dependency is **commented out** (incompatible with 2.7.x). |
+| `sbs`                | 3.5.16      | —            | —                    | rocketmq-spring-boot-starter 2.3.6 (V4) | Starter (no Spring Cloud Stream).                                                                       |
+| `sbs-v5`             | 3.5.16      | —            | —                    | rocketmq-v5-client-spring-boot-starter 2.3.6 | V5 starter.                                                                                             |
 | `client-v5`          | —           | —            | —                    | rocketmq-client-java 5.2.2 (gRPC)         | Raw V5 client, no Spring. JUnit 5 standalone.                                                          |
 | `client`             | —           | —            | —                    | rocketmq-client 5.5.1 (Remoting)          | Raw V4 client, no Spring. JUnit 5 standalone. Includes admin / ACL examples.                          |
 
 `spring-cloud-v*` and `sbs*` modules inherit dependency management from
 `spring-boot-starter-parent`; `client` and `client-v5` do not (no Spring Boot) and
-declare `junit-jupiter` 5.10.3 directly.
+declare `junit-jupiter` 5.14.4 directly.
 
 ## The `test-support` module
 

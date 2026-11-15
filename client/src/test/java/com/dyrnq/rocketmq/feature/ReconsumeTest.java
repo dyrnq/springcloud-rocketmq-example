@@ -80,8 +80,9 @@ class ReconsumeTest {
     assertNotNull(result);
 
     // Wait for RETRIES_BEFORE_SUCCESS + 1 deliveries (the two RETRY_LATER + the final SUCCESS).
+    // The broker's retry delay schedule (10s then 30s+) can push the final delivery past 60s.
     com.dyrnq.rocketmq.testsupport.ReceiptAwaiter.waitingFor(
-            matchingReceived, RETRIES_BEFORE_SUCCESS + 1, Duration.ofSeconds(60))
+            matchingReceived, RETRIES_BEFORE_SUCCESS + 1, Duration.ofSeconds(150))
         .poll("push consumer to receive " + (RETRIES_BEFORE_SUCCESS + 1) + " deliveries");
 
     assertTrue(

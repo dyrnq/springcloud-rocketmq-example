@@ -18,6 +18,7 @@ public class PushConsumerRunner implements CommandLineRunner {
   public void run(String... args) {}
 
   @Service
+  @Profile("!test")
   @RocketMQMessageListener(topic = "demo-topic", consumerGroup = "demo-group")
   public static class DemoConsumer implements RocketMQListener<String> {
     public void onMessage(String message) {

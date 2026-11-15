@@ -28,8 +28,8 @@ Test counts are the current snapshot — numbers shift as new tests are added.
 
 | Module               | Tests                                                                                                                                  | Count |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| `client`             | `AdminToolTest`, `DelayLevelTest`, `OrderlyConsumeTest`, `PushConsumeTest`, `ReconsumeTest`, `SyncSendTest`                           | 6     |
-| `client-v5`          | `AsyncSendTest`, `AsyncSimpleConsumeTest`, `DelayTimestampTest`, `FifoMessageTest`, `MessageKeysTest`, `PushConsumeTest`, `SimpleConsumeTest`, `SyncSendTest`, `TransactionalSendTest`, `TransactionRollbackTest` | 10 |
+| `client`             | `AdminToolTest`, `DelayLevelTest`, `OrderlyConsumeTest`, `PushConsumeTest`, `ReconsumeTest`, `SyncSendTest`, `BatchSendTest`, `SqlFilterConsumeTest`, `BroadcastConsumeTest` | 9 |
+| `client-v5`          | `AsyncSendTest`, `AsyncSimpleConsumeTest`, `DelayTimestampTest`, `FifoMessageTest`, `MessageKeysTest`, `PushConsumeTest`, `SimpleConsumeTest`, `SyncSendTest`, `TransactionalSendTest`, `TransactionRollbackTest`, `PopNackChangeInvisibleDurationTest` | 11 |
 | `sbs`                | `ContextLoadsTest`, `DelayLevelTest`, `DelayTimestampTest`, `PushConsumeTest`, `SyncSendTest`                                          | 5     |
 | `sbs-v5`             | `AsyncDelayTimestampTest`, `AsyncSendTest`, `ContextLoadsTest`, `DelayTimestampTest`, `FifoMessageTest`, `PushConsumeTest`, `SyncSendTest`, `TransactionalSendTest` | 8 |
 | `spring-cloud-v2021` | `AsyncSendTest`, `ContextLoadsTest`, `PushConsumeTest`                                                                                 | 3     |
@@ -37,11 +37,11 @@ Test counts are the current snapshot — numbers shift as new tests are added.
 | `spring-cloud-v2025` | `AsyncSendTest`, `ContextLoadsTest`, `PushConsumeTest`                                                                                 | 3     |
 | `spring-cloud-v2025-1` | `AsyncSendTest`, `ContextLoadsTest`, `PushConsumeTest`                                                                               | 3     |
 
-Total: **42 tests** across 8 modules.
+Total: **46 tests** across 8 modules.
 
 ## Test dimensions covered
 
-Each module exercises the same five production dimensions, where the underlying client
+Each module exercises the same production dimensions, where the underlying client
 supports them:
 
 | Dimension       | What it verifies                                                                  | V4 API                                | V5 API                                                |
@@ -59,6 +59,10 @@ supports them:
 | Keys round-trip | Producer-side `setKeys` is preserved by broker and visible via `MessageView.getKeys()` | n/a                                 | `MessageBuilder.setKeys(...)`                         |
 | TX rollback     | `tx.rollback()` causes broker to discard the half-committed message               | n/a                                   | `Transaction.rollback()`                              |
 | Binder tag      | `MessageConst.PROPERTY_TAGS` header reaches the broker and is visible to a raw V4 consumer | n/a                              | n/a (header set in Spring Cloud Stream producer)      |
+| Batch send      | `producer.send(Collection, timeout)` returns success for several messages         | `DefaultMQProducer.send(Collection, long)` | n/a                                               |
+| SQL92 filter    | Consumer receives only messages whose user property satisfies the SQL expression | `MessageSelector.bySql(...)`, `Message.putUserProperty` | n/a (not exercised)                 |
+| Broadcast consume | A broadcast push consumer receives the message without queue rebalance          | `DefaultMQPushConsumer.setMessageModel(BROADCASTING)` | n/a                                      |
+| POP nack / invisible time | `changeInvisibleDuration(view, Duration.ZERO)` requeues and redelivers the message | n/a                             | `SimpleConsumer.changeInvisibleDuration(view, Duration.ZERO)` |
 
 ## Key test patterns
 
@@ -196,7 +200,8 @@ String body = MessageViewBytes.toString(messageView);
 
 Used by `AsyncSendTest`, `AsyncSimpleConsumeTest`, `DelayTimestampTest`, `FifoMessageTest`,
 `MessageKeysTest`, `PushConsumeTest`, `SimpleConsumeTest`, `SyncSendTest`,
-`TransactionalSendTest`, `TransactionRollbackTest` (every V5 test in `client-v5`).
+`TransactionalSendTest`, `TransactionRollbackTest`, `PopNackChangeInvisibleDurationTest`
+(every V5 test in `client-v5`).
 
 ## Known flaky tests
 

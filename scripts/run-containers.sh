@@ -70,6 +70,7 @@ brokerId=0
 namesrvAddr=_NAMESRVADDR
 autoCreateTopicEnable=true
 autoCreateSubscriptionGroup=true
+enablePropertyFilter=true
 listenPort=10911
 # Broker的角色
 # ASYNC_MASTER 异步复制Master

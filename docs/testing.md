@@ -218,6 +218,20 @@ Other tests are stable on a single-broker controller-mode topology.
 
 ## CI
 
-The CI pipeline (`mvn -B package --file pom.xml -Dmaven.test.skip=true`) **does not run
-tests** — only build and format check. So a test regression won't be caught by CI. Run
-tests locally before pushing. See [ci.md](ci.md).
+Two GitHub Actions workflows run on push/PR to `main`:
+
+- `.github/workflows/maven.yml` — build + Spotless format check (`mvn -B package
+  -Dmaven.test.skip=true`), no broker, no tests.
+- `.github/workflows/integration-test.yml` — starts a minimal RocketMQ topology via
+  `scripts/ci/start-rocketmq.sh` (namesrv + one broker + one proxy on `127.0.0.1`) and runs
+  the full `mvn -B test` suite against it. Surefire reports are uploaded as an artifact.
+
+Test endpoints are configurable through environment variables; each defaults to the Vagrant VM
+address so local development is unchanged:
+
+| Variable            | Default                 | Used by                       |
+| ------------------- | ----------------------- | ----------------------------- |
+| `ROCKETMQ_NAMESRV`  | `192.168.88.123:9876`   | V4 clients, Spring modules    |
+| `ROCKETMQ_PROXY`    | `192.168.88.123:8181`   | V5 gRPC clients               |
+| `ROCKETMQ_BROKER_1` | `192.168.88.123:11911`  | `Addresses.BROKER_ADDR_1`     |
+| `ROCKETMQ_BROKER_2` | `192.168.88.123:13911`  | `Addresses.BROKER_ADDR_2`     |

@@ -1,0 +1,48 @@
+name: RocketMQ Integration Tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      ROCKETMQ_NAMESRV: 127.0.0.1:9876
+      ROCKETMQ_PROXY: 127.0.0.1:8181
+      ROCKETMQ_BROKER_1: 127.0.0.1:11911
+      ROCKETMQ_BROKER_2: 127.0.0.1:13911
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Start RocketMQ
+        run: bash scripts/ci/start-rocketmq.sh
+
+      - name: Run integration tests
+        run: mvn -B clean test --fail-at-end -Dsurefire.rerunFailingTestsCount=1
+
+      - name: Dump broker logs on failure
+        if: failure()
+        run: |
+          docker logs rmq-namesrv || true
+          docker logs rmq-broker || true
+          docker logs rmq-proxy || true
+
+      - name: Upload surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: '**/target/surefire-reports/*'
+          retention-days: 7

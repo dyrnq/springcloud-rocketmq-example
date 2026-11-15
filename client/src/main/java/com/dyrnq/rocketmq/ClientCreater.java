@@ -28,8 +28,8 @@ import org.apache.rocketmq.common.consumer.ConsumeFromWhere;
 /** Description: 创建客户端 生产者或消费者 */
 public class ClientCreater {
 
-  /** nameserver地址 */
-  public static final String NAMESERVER = "192.168.88.123:9876";
+  /** nameserver地址（默认指向 Vagrant VM，CI 通过 ROCKETMQ_NAMESRV 覆盖） */
+  public static final String NAMESERVER = envOr("ROCKETMQ_NAMESRV", "192.168.88.123:9876");
 
   /** accessKey 对应角色密钥 */
   public static final String ACCESS_KEY = "ak";
@@ -99,5 +99,10 @@ public class ClientCreater {
     pullConsumer.setEnableMsgTrace(true);
     pullConsumer.setCustomizedTraceTopic(null);
     return pullConsumer;
+  }
+
+  private static String envOr(String key, String defaultValue) {
+    String value = System.getenv(key);
+    return value == null || value.isBlank() ? defaultValue : value;
   }
 }

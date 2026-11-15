@@ -28,16 +28,16 @@ Test counts are the current snapshot — numbers shift as new tests are added.
 
 | Module               | Tests                                                                                                                                  | Count |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| `client`             | `AdminToolTest`, `DelayLevelTest`, `OrderlyConsumeTest`, `PushConsumeTest`, `ReconsumeTest`, `SyncSendTest`, `BatchSendTest`, `SqlFilterConsumeTest`, `BroadcastConsumeTest` | 9 |
-| `client-v5`          | `AsyncSendTest`, `AsyncSimpleConsumeTest`, `DelayTimestampTest`, `FifoMessageTest`, `MaxStartupAttemptsTest`, `MessageKeysTest`, `PushConsumeTest`, `RequestTimeoutTest`, `SimpleConsumeTest`, `SyncSendTest`, `TransactionalSendTest`, `TransactionRollbackTest`, `PopNackChangeInvisibleDurationTest` | 13 |
-| `sbs`                | `ContextLoadsTest`, `DelayLevelTest`, `DelayTimestampTest`, `PushConsumeTest`, `SyncSendTest`                                          | 5     |
+| `client`             | `AdminToolTest`, `BatchSendTest`, `BroadcastConsumeTest`, `ConsumerLoadBalanceTest`, `ConsumerOffsetResetTest`, `ConsumerProgressTest`, `DelayLevelTest`, `OrderlyConsumeTest`, `PullConsumeTest`, `PushConsumeTest`, `ReconsumeTest`, `SendRetryTest`, `SendThrottleTest`, `SqlFilterConsumeTest`, `SyncSendTest`, `TransactionalSendTest` | 16 |
+| `client-v5`          | `AsyncSendTest`, `AsyncSimpleConsumeTest`, `DelayTimestampTest`, `FifoMessageTest`, `MaxStartupAttemptsTest`, `MessageKeysTest`, `PopNackChangeInvisibleDurationTest`, `PushConsumeTest`, `RequestTimeoutTest`, `SimpleConsumeTest`, `Sql92FilterTest`, `SyncSendTest`, `TransactionRollbackTest`, `TransactionalSendTest` | 14 |
+| `sbs`                | `ContextLoadsTest`, `DelayLevelTest`, `DelayTimestampTest`, `OrderlyConsumeTest`, `PushConsumeTest`, `ReconsumeTest`, `SyncSendTest`, `TransactionalSendTest` | 8 |
 | `sbs-v5`             | `AsyncDelayTimestampTest`, `AsyncSendTest`, `ContextLoadsTest`, `DelayTimestampTest`, `FifoMessageTest`, `PushConsumeTest`, `SyncSendTest`, `TransactionalSendTest` | 8 |
-| `spring-cloud-v2021` | `AsyncSendTest`, `ContextLoadsTest`, `PushConsumeTest`                                                                                 | 3     |
-| `spring-cloud-v2023` | `AsyncSendTest`, `BinderTagHeaderTest`, `ContextLoadsTest`, `PushConsumeTest`                                                           | 4     |
-| `spring-cloud-v2025` | `AsyncSendTest`, `ContextLoadsTest`, `PushConsumeTest`                                                                                 | 3     |
-| `spring-cloud-v2025-1` | `AsyncSendTest`, `ContextLoadsTest`, `PushConsumeTest`                                                                               | 3     |
+| `spring-cloud-v2021` | `AsyncSendTest`, `ContextLoadsTest`, `FifoConsumeTest`, `PushConsumeTest`, `ReconsumeTest` | 5 |
+| `spring-cloud-v2023` | `AsyncSendTest`, `BinderTagHeaderTest`, `ContextLoadsTest`, `FifoConsumeTest`, `PushConsumeTest`, `ReconsumeTest` | 6 |
+| `spring-cloud-v2025` | `AsyncSendTest`, `ContextLoadsTest`, `FifoConsumeTest`, `PushConsumeTest`, `ReconsumeTest` | 5 |
+| `spring-cloud-v2025-1` | `AsyncSendTest`, `ContextLoadsTest`, `FifoConsumeTest`, `PushConsumeTest`, `ReconsumeTest` | 5 |
 
-Total: **48 tests** across 8 modules.
+Total: **67 tests** across 8 modules.
 
 ## Test dimensions covered
 
@@ -62,6 +62,8 @@ supports them:
 | Batch send      | `producer.send(Collection, timeout)` returns success for several messages         | `DefaultMQProducer.send(Collection, long)` | n/a                                               |
 | SQL92 filter    | Consumer receives only messages whose user property satisfies the SQL expression | `MessageSelector.bySql(...)`, `Message.putUserProperty` | n/a (not exercised)                 |
 | Broadcast consume | A broadcast push consumer receives the message without queue rebalance          | `DefaultMQPushConsumer.setMessageModel(BROADCASTING)` | n/a                                      |
+| Consumer offset reset | Resetting a queue offset back to a consumed message offset makes the broker redeliver that message | `DefaultMQAdminExt.resetOffsetByQueueId(...)` | n/a |
+| Send throttling (surface) | Documents open-source backpressure codes and producer retry knobs (commercial 530 not applicable) | `ResponseCode.FLOW_CONTROL`, `RemotingSysResponseCode.SYSTEM_BUSY` | n/a |
 | POP nack / invisible time | `changeInvisibleDuration(view, Duration.ZERO)` requeues and redelivers the message | n/a                             | `SimpleConsumer.changeInvisibleDuration(view, Duration.ZERO)` |
 | gRPC request timeout | `setRequestTimeout` round-trips through `ClientConfiguration` and a normal send succeeds | n/a | `RequestTimeoutTest` (5s deadline, small body) |
 | gRPC startup attempts | `setMaxStartupAttempts` gives up after the configured route-fetch attempts and reports the count | n/a | `MaxStartupAttemptsTest` (unreachable endpoint) |

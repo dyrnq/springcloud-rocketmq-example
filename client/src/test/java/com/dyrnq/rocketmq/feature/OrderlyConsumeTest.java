@@ -19,8 +19,10 @@ import org.apache.rocketmq.client.consumer.listener.ConsumeOrderlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeOrderlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerOrderly;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
+import org.apache.rocketmq.client.producer.MessageQueueSelector;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
+import org.apache.rocketmq.common.message.MessageQueue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -126,5 +128,56 @@ class OrderlyConsumeTest {
     assertTrue(
         thisRunBodies.stream().allMatch(b -> b.startsWith(runPrefix)),
         "All bodies should carry this test's marker prefix");
+  }
+
+  @Test
+  void orderlyListenerPreservesFifoTopicOrderWithinOneQueue() throws Exception {
+    String prefix = "fifo-order-marker-" + UUID.randomUUID() + "-";
+    List<String> receivedFifo = new CopyOnWriteArrayList<>();
+
+    DefaultMQPushConsumer fifoConsumer = ClientCreater.createPushConsumer(Groups.uniquePush());
+    fifoConsumer.subscribe(Topics.TOPIC_FIFO, "*");
+    fifoConsumer.registerMessageListener(
+        (MessageListenerOrderly)
+            (List<MessageExt> msgs, ConsumeOrderlyContext ctx) -> {
+              for (MessageExt m : msgs) {
+                String body = new String(m.getBody(), StandardCharsets.UTF_8);
+                if (body.startsWith(prefix)) {
+                  receivedFifo.add(body);
+                }
+              }
+              return ConsumeOrderlyStatus.SUCCESS;
+            });
+    fifoConsumer.start();
+
+    try {
+      MessageQueueSelector sameQueue =
+          (mqs, msg, arg) -> {
+            for (MessageQueue q : mqs) {
+              if (q.getQueueId() == 0) {
+                return q;
+              }
+            }
+            return mqs.get(0);
+          };
+      for (int i = 0; i < MESSAGE_COUNT; i++) {
+        Message m = new Message(Topics.TOPIC_FIFO, (prefix + i).getBytes(StandardCharsets.UTF_8));
+        m.setTags("fifo-order");
+        org.apache.rocketmq.client.producer.SendResult r = producer.send(m, sameQueue, null);
+        assertNotNull(r);
+      }
+
+      long deadline = System.currentTimeMillis() + 30_000;
+      while (receivedFifo.size() < MESSAGE_COUNT && System.currentTimeMillis() < deadline) {
+        Thread.sleep(100);
+      }
+      assertEquals(MESSAGE_COUNT, receivedFifo.size(), "should receive all FIFO messages");
+
+      List<String> expected =
+          IntStream.range(0, MESSAGE_COUNT).mapToObj(i -> prefix + i).collect(Collectors.toList());
+      assertEquals(expected, receivedFifo, "FIFO messages in the same queue must keep send order");
+    } finally {
+      fifoConsumer.shutdown();
+    }
   }
 }

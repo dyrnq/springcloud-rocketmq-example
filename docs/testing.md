@@ -28,7 +28,7 @@ Test counts are the current snapshot — numbers shift as new tests are added.
 
 | Module               | Tests                                                                                                                                  | Count |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| `client`             | `AdminToolTest`, `BatchSendTest`, `BroadcastConsumeTest`, `ConsumerLoadBalanceTest`, `ConsumerOffsetResetTest`, `ConsumerProgressTest`, `DelayLevelTest`, `OrderlyConsumeTest`, `PullConsumeTest`, `PushConsumeTest`, `ReconsumeTest`, `SendRetryTest`, `SendThrottleTest`, `SqlFilterConsumeTest`, `SyncSendTest`, `TransactionalSendTest` | 16 |
+| `client`             | `AdminToolTest`, `BatchSendTest`, `BroadcastConsumeTest`, `ConsumerLoadBalanceTest`, `ConsumerOffsetResetTest`, `ConsumerProgressTest`, `DeadLetterTest`, `DelayLevelTest`, `OrderlyConsumeTest`, `PullConsumeTest`, `PushConsumeTest`, `ReconsumeTest`, `SendRetryTest`, `SendThrottleTest`, `SqlFilterConsumeTest`, `SyncSendTest`, `TransactionalSendTest` | 17 |
 | `client-v5`          | `AsyncSendTest`, `AsyncSimpleConsumeTest`, `DelayTimestampTest`, `FifoMessageTest`, `MaxStartupAttemptsTest`, `MessageKeysTest`, `PopNackChangeInvisibleDurationTest`, `PushConsumeTest`, `RequestTimeoutTest`, `SimpleConsumeTest`, `Sql92FilterTest`, `SyncSendTest`, `TransactionRollbackTest`, `TransactionalSendTest` | 14 |
 | `sbs`                | `ContextLoadsTest`, `DelayLevelTest`, `DelayTimestampTest`, `OrderlyConsumeTest`, `PushConsumeTest`, `ReconsumeTest`, `SyncSendTest`, `TransactionalSendTest` | 8 |
 | `sbs-v5`             | `AsyncDelayTimestampTest`, `AsyncSendTest`, `ContextLoadsTest`, `DelayTimestampTest`, `FifoMessageTest`, `PushConsumeTest`, `SyncSendTest`, `TransactionalSendTest` | 8 |
@@ -37,7 +37,7 @@ Test counts are the current snapshot — numbers shift as new tests are added.
 | `spring-cloud-v2025` | `AsyncSendTest`, `ContextLoadsTest`, `FifoConsumeTest`, `PushConsumeTest`, `ReconsumeTest` | 5 |
 | `spring-cloud-v2025-1` | `AsyncSendTest`, `ContextLoadsTest`, `FifoConsumeTest`, `PushConsumeTest`, `ReconsumeTest` | 5 |
 
-Total: **67 tests** across 8 modules.
+Total: **68 tests** across 8 modules.
 
 ## Test dimensions covered
 
@@ -52,17 +52,23 @@ supports them:
 | Delay (level)   | Message with `setDelayTimeLevel(N)` is delivered ≥ N seconds after send           | `Message.setDelayTimeLevel(2)`         | n/a (V5 only supports absolute timestamp)             |
 | Delay (time)    | Message with `setDeliverTimeMs(now+Δ)` is delivered at approximately `now+Δ`     | `Message.setDeliverTimeMs(...)`        | `syncSendDelayMessage(topic, body, Duration)`         |
 | FIFO            | Messages with the same `MessageGroup` arrive in send order, single consumer       | (V4 FIFO is topic-level, not group)   | `MessageBuilder.setMessageGroup(...)`                 |
+| FIFO queue order | Messages forced onto one FIFO queue arrive in send order under `MessageListenerOrderly` | `MessageQueueSelector`, `MessageListenerOrderly` | n/a |
 | Transaction     | Local transaction state transitions COMMIT / ROLLBACK are observable              | `TransactionMQProducer`               | `RocketMQClientTemplate.sendMessageInTransaction`     |
+| Transaction no-checkback | After the local transaction commits, the broker does not call `checkLocalTransaction` again | `TransactionListener.checkLocalTransaction` counter | n/a |
 | Simple consume  | `SimpleConsumer.receive()` + `ack()` (RocketMQ 5 POP / pull-on-demand mode) returns the expected message body | n/a | `SimpleConsumer.builder()...build()`                  |
 | Orderly consume | `MessageListenerOrderly` receives all messages from a queue in send order         | `MessageListenerOrderly`              | n/a                                                   |
 | Reconsume       | Listener returning `RECONSUME_LATER` causes broker redelivery; `getReconsumeTimes()` increments | `ConsumeConcurrentlyStatus.RECONSUME_LATER` | n/a                                            |
+| Dead letter     | After the consumer exhausts its retries, the failed message is moved to `%DLQ%<group>` | `setMaxReconsumeTimes(0)`, `MixAll.getDLQTopic(...)` | n/a                                     |
 | Keys round-trip | Producer-side `setKeys` is preserved by broker and visible via `MessageView.getKeys()` | n/a                                 | `MessageBuilder.setKeys(...)`                         |
 | TX rollback     | `tx.rollback()` causes broker to discard the half-committed message               | n/a                                   | `Transaction.rollback()`                              |
 | Binder tag      | `MessageConst.PROPERTY_TAGS` header reaches the broker and is visible to a raw V4 consumer | n/a                              | n/a (header set in Spring Cloud Stream producer)      |
 | Batch send      | `producer.send(Collection, timeout)` returns success for several messages         | `DefaultMQProducer.send(Collection, long)` | n/a                                               |
+| Batch send (compressed) | A batch whose bodies exceed the compression threshold still sends successfully | `DefaultMQProducer.setCompressMsgBodyOverHowmuch(1)` | n/a |
 | SQL92 filter    | Consumer receives only messages whose user property satisfies the SQL expression | `MessageSelector.bySql(...)`, `Message.putUserProperty` | n/a (not exercised)                 |
+| SQL92 boolean filter | Boolean user property (`true`/`false`) is compared as a boolean and only the matching message is delivered | `MessageSelector.bySql("v4SqlBoolean = true")` | n/a (not exercised) |
 | Broadcast consume | A broadcast push consumer receives the message without queue rebalance          | `DefaultMQPushConsumer.setMessageModel(BROADCASTING)` | n/a                                      |
 | Consumer offset reset | Resetting a queue offset back to a consumed message offset makes the broker redeliver that message | `DefaultMQAdminExt.resetOffsetByQueueId(...)` | n/a |
+| FIFO offset reset | Resetting a FIFO topic queue offset redelivers the message to an orderly consumer | `DefaultMQAdminExt.resetOffsetByQueueId(...)`, `MessageListenerOrderly` | n/a |
 | Send throttling (surface) | Documents open-source backpressure codes and producer retry knobs (commercial 530 not applicable) | `ResponseCode.FLOW_CONTROL`, `RemotingSysResponseCode.SYSTEM_BUSY` | n/a |
 | POP nack / invisible time | `changeInvisibleDuration(view, Duration.ZERO)` requeues and redelivers the message | n/a                             | `SimpleConsumer.changeInvisibleDuration(view, Duration.ZERO)` |
 | gRPC request timeout | `setRequestTimeout` round-trips through `ClientConfiguration` and a normal send succeeds | n/a | `RequestTimeoutTest` (5s deadline, small body) |
@@ -223,6 +229,26 @@ not caused by formatting or other code-style changes.
 | `AsyncSimpleConsumeTest`                   | `client-v5` | Same as above                                            | Same; the two tests interfere via gRPC long-poll subscription caching |
 
 Other tests are stable on a single-broker controller-mode topology.
+
+## Known upstream bugs (disabled tests)
+
+These regression tests encode the expected behaviour, but the corresponding upstream
+fix has not shipped in the broker image yet, so they are `@Disabled`:
+
+| Test                                                             | Module  | Upstream issue                                     |
+| ---------------------------------------------------------------- | ------- | -------------------------------------------------- |
+| `DelayLevelTest#deliveredDelayMessageDoesNotLeakInternalProperties` | `client` | [apache/rocketmq#11037](https://github.com/apache/rocketmq/issues/11037) — `ScheduleMessageService` still leaks `DELAY` / timer properties |
+
+## Not covered (environmental / broker-internal)
+
+These behaviours are hard to exercise deterministically in CI, so they are tracked as
+known gaps rather than automated tests:
+
+| Behaviour                                                       | Upstream issue                                    |
+| --------------------------------------------------------------- | ------------------------------------------------- |
+| POP retry re-applies tag / SQL92 filter                          | [apache/rocketmq#6384](https://github.com/apache/rocketmq/issues/6384) |
+| Broadcast consumer message loss on startup                       | [apache/rocketmq#9281](https://github.com/apache/rocketmq/issues/9281) |
+| Broadcast offset-table validation                                | [apache/rocketmq#9603](https://github.com/apache/rocketmq/issues/9603) |
 
 ## CI
 

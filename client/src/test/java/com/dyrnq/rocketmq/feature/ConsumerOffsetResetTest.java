@@ -8,11 +8,15 @@ import com.dyrnq.rocketmq.testsupport.Addresses;
 import com.dyrnq.rocketmq.testsupport.Groups;
 import com.dyrnq.rocketmq.testsupport.Topics;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
+import org.apache.rocketmq.client.consumer.listener.ConsumeOrderlyContext;
+import org.apache.rocketmq.client.consumer.listener.ConsumeOrderlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
+import org.apache.rocketmq.client.consumer.listener.MessageListenerOrderly;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
@@ -85,6 +89,30 @@ class ConsumerOffsetResetTest {
     assertEquals(1, received.get(), "same message should be redelivered once after offset reset");
   }
 
+  @Test
+  void resetOffsetRedeliversFifoMessage() throws Exception {
+    SendResult result =
+        producer.send(new Message(Topics.TOPIC_FIFO, bodyMarker.getBytes(StandardCharsets.UTF_8)));
+    MessageQueue queue = result.getMessageQueue();
+    long messageOffset = result.getQueueOffset();
+
+    consumer = startFifoConsumer();
+    awaitDelivery(1);
+
+    consumer.shutdown();
+    consumer = null;
+
+    admin.resetOffsetByQueueId(
+        Addresses.BROKER_ADDR_1, group, Topics.TOPIC_FIFO, queue.getQueueId(), messageOffset);
+
+    received.set(0);
+    consumer = startFifoConsumer();
+    awaitDelivery(1);
+
+    assertEquals(
+        1, received.get(), "same FIFO message should be redelivered once after offset reset");
+  }
+
   private DefaultMQPushConsumer startConsumer() throws Exception {
     DefaultMQPushConsumer c = ClientCreater.createPushConsumer(group);
     c.subscribe(Topics.TOPIC_NORMAL, "*");
@@ -97,6 +125,23 @@ class ConsumerOffsetResetTest {
                 }
               }
               return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+            });
+    c.start();
+    return c;
+  }
+
+  private DefaultMQPushConsumer startFifoConsumer() throws Exception {
+    DefaultMQPushConsumer c = ClientCreater.createPushConsumer(group);
+    c.subscribe(Topics.TOPIC_FIFO, "*");
+    c.registerMessageListener(
+        (MessageListenerOrderly)
+            (List<MessageExt> msgs, ConsumeOrderlyContext ctx) -> {
+              for (MessageExt m : msgs) {
+                if (bodyMarker.equals(new String(m.getBody(), StandardCharsets.UTF_8))) {
+                  received.incrementAndGet();
+                }
+              }
+              return ConsumeOrderlyStatus.SUCCESS;
             });
     c.start();
     return c;

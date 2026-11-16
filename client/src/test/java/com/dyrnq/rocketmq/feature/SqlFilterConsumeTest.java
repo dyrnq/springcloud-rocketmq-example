@@ -102,6 +102,51 @@ class SqlFilterConsumeTest {
     assertEquals(0, nonMatchingReceived.get(), "Non-matching message should be filtered out");
   }
 
+  @Test
+  void booleanPropertyFilterDeliversOnlyMatchingMessages() throws Exception {
+    String boolProperty = "v4SqlBoolean";
+    String trueMarker = "sql-bool-true-" + UUID.randomUUID();
+    String falseMarker = "sql-bool-false-" + UUID.randomUUID();
+    AtomicInteger trueReceived = new AtomicInteger();
+    AtomicInteger falseReceived = new AtomicInteger();
+
+    DefaultMQPushConsumer boolConsumer = ClientCreater.createPushConsumer(Groups.uniquePush());
+    boolConsumer.subscribe(Topics.TOPIC_A, MessageSelector.bySql(boolProperty + " = true"));
+    boolConsumer.registerMessageListener(
+        (MessageListenerConcurrently)
+            (msgs, context) -> {
+              for (org.apache.rocketmq.common.message.MessageExt m : msgs) {
+                if (isMarker(m, trueMarker)) {
+                  trueReceived.incrementAndGet();
+                } else if (isMarker(m, falseMarker)) {
+                  falseReceived.incrementAndGet();
+                }
+              }
+              return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+            });
+    boolConsumer.start();
+
+    Message trueMsg =
+        new Message(Topics.TOPIC_A, "yourMessageTagA", trueMarker.getBytes(StandardCharsets.UTF_8));
+    trueMsg.putUserProperty(boolProperty, "true");
+    producer.send(trueMsg, 3_000);
+
+    Message falseMsg =
+        new Message(
+            Topics.TOPIC_A, "yourMessageTagA", falseMarker.getBytes(StandardCharsets.UTF_8));
+    falseMsg.putUserProperty(boolProperty, "false");
+    producer.send(falseMsg, 3_000);
+
+    ReceiptAwaiter.waitingFor(trueReceived, 1, Duration.ofSeconds(30))
+        .poll("push consumer to receive boolean 'true' property message");
+
+    TimeUnit.SECONDS.sleep(5);
+    boolConsumer.shutdown();
+
+    assertTrue(trueReceived.get() >= 1, "Boolean 'true' property message should be delivered");
+    assertEquals(0, falseReceived.get(), "Boolean 'false' property message should be filtered out");
+  }
+
   private static boolean isMarker(
       org.apache.rocketmq.common.message.MessageExt message, String marker) {
     return marker != null && new String(message.getBody(), StandardCharsets.UTF_8).contains(marker);

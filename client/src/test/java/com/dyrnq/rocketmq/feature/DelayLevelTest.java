@@ -1,6 +1,7 @@
 package com.dyrnq.rocketmq.feature;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.dyrnq.rocketmq.ClientCreater;
@@ -17,8 +18,11 @@ import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.common.message.MessageConst;
+import org.apache.rocketmq.common.message.MessageExt;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -41,6 +45,7 @@ class DelayLevelTest {
   private final AtomicInteger matchingReceived = new AtomicInteger();
   private final AtomicLong firstDeliveryAt = new AtomicLong(0);
   private String bodyMarker;
+  private volatile MessageExt capturedMessage;
 
   @BeforeEach
   void setUp() throws Exception {
@@ -51,9 +56,10 @@ class DelayLevelTest {
     consumer.registerMessageListener(
         (MessageListenerConcurrently)
             (msgs, context) -> {
-              for (org.apache.rocketmq.common.message.MessageExt m : msgs) {
+              for (MessageExt m : msgs) {
                 String body = new String(m.getBody(), StandardCharsets.UTF_8);
                 if (body.equals(bodyMarker)) {
+                  capturedMessage = m;
                   firstDeliveryAt.compareAndSet(0, System.currentTimeMillis());
                   matchingReceived.incrementAndGet();
                 }
@@ -86,5 +92,35 @@ class DelayLevelTest {
     assertTrue(
         elapsed >= EXPECTED_DELAY_MS - DELAY_TOLERANCE_MS,
         "Delivery should be at least ~5s after send, but was " + elapsed + "ms");
+  }
+
+  /**
+   * A delivered delay-level message must not expose broker-internal properties on the wire.
+   *
+   * <p>Disabled until an upstream release contains the fix; broker 5.3.0 still leaks {@code DELAY}.
+   * See https://github.com/apache/rocketmq/issues/11037.
+   */
+  @Disabled("https://github.com/apache/rocketmq/issues/11037: internal delay props still leak")
+  @Test
+  void deliveredDelayMessageDoesNotLeakInternalProperties() throws Exception {
+    Message msg = new Message(Topics.TOPIC_DELAY, bodyMarker.getBytes(StandardCharsets.UTF_8));
+    msg.setDelayTimeLevel(DELAY_LEVEL);
+
+    SendResult result = producer.send(msg);
+    assertNotNull(result);
+
+    ReceiptAwaiter.waitingFor(matchingReceived, 1, Duration.ofSeconds(30))
+        .poll("push consumer to receive delayed message for property-leak check");
+
+    assertNotNull(capturedMessage, "delayed message should have been captured");
+    assertNull(
+        capturedMessage.getProperty(MessageConst.PROPERTY_DELAY_TIME_LEVEL),
+        "internal delay-level property must not leak to consumers");
+    assertNull(
+        capturedMessage.getProperty(MessageConst.PROPERTY_TIMER_DELIVER_MS),
+        "internal timer-deliver property must not leak to consumers");
+    assertNull(
+        capturedMessage.getProperty(MessageConst.PROPERTY_TIMER_DELAY_SEC),
+        "internal timer-delay property must not leak to consumers");
   }
 }

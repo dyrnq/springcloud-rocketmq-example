@@ -52,4 +52,19 @@ class BatchSendTest {
         result.getSendStatus(),
         "Batch send to " + Topics.TOPIC_A + " should succeed");
   }
+
+  @Test
+  void compressedBatchSendSucceeds() throws Exception {
+    producer.setCompressMsgBodyOverHowmuch(1);
+    List<Message> messages = new ArrayList<>();
+    for (int i = 0; i < 5; i++) {
+      messages.add(MessageFactory.v4OfSize(Topics.TOPIC_A, 1024));
+    }
+    SendResult result = producer.send(messages, 3_000);
+    assertNotNull(result);
+    assertEquals(
+        SendStatus.SEND_OK,
+        result.getSendStatus(),
+        "Compressed batch send to " + Topics.TOPIC_A + " should succeed");
+  }
 }
